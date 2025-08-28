@@ -9,50 +9,268 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as RegisterRouteImport } from './routes/register'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as LayoutRouteImport } from './routes/_layout'
+import { Route as LayoutIndexRouteImport } from './routes/_layout/index'
+import { Route as LayoutUsersRouteImport } from './routes/_layout/users'
+import { Route as LayoutOrdersRouteImport } from './routes/_layout/orders'
+import { Route as LayoutMenuIndexRouteImport } from './routes/_layout/menu/index'
+import { Route as LayoutMenuToppingsRouteImport } from './routes/_layout/menu/toppings'
+import { Route as LayoutMenuSizeRouteImport } from './routes/_layout/menu/size'
+import { Route as LayoutMenuPizzaRouteImport } from './routes/_layout/menu/pizza'
+import { Route as LayoutMenuCrustRouteImport } from './routes/_layout/menu/crust'
 
-const IndexRoute = IndexRouteImport.update({
+const RegisterRoute = RegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LayoutRoute = LayoutRouteImport.update({
+  id: '/_layout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LayoutIndexRoute = LayoutIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => LayoutRoute,
+} as any)
+const LayoutUsersRoute = LayoutUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => LayoutRoute,
+} as any)
+const LayoutOrdersRoute = LayoutOrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
+  getParentRoute: () => LayoutRoute,
+} as any)
+const LayoutMenuIndexRoute = LayoutMenuIndexRouteImport.update({
+  id: '/menu/',
+  path: '/menu/',
+  getParentRoute: () => LayoutRoute,
+} as any)
+const LayoutMenuToppingsRoute = LayoutMenuToppingsRouteImport.update({
+  id: '/menu/toppings',
+  path: '/menu/toppings',
+  getParentRoute: () => LayoutRoute,
+} as any)
+const LayoutMenuSizeRoute = LayoutMenuSizeRouteImport.update({
+  id: '/menu/size',
+  path: '/menu/size',
+  getParentRoute: () => LayoutRoute,
+} as any)
+const LayoutMenuPizzaRoute = LayoutMenuPizzaRouteImport.update({
+  id: '/menu/pizza',
+  path: '/menu/pizza',
+  getParentRoute: () => LayoutRoute,
+} as any)
+const LayoutMenuCrustRoute = LayoutMenuCrustRouteImport.update({
+  id: '/menu/crust',
+  path: '/menu/crust',
+  getParentRoute: () => LayoutRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
+  '/orders': typeof LayoutOrdersRoute
+  '/users': typeof LayoutUsersRoute
+  '/': typeof LayoutIndexRoute
+  '/menu/crust': typeof LayoutMenuCrustRoute
+  '/menu/pizza': typeof LayoutMenuPizzaRoute
+  '/menu/size': typeof LayoutMenuSizeRoute
+  '/menu/toppings': typeof LayoutMenuToppingsRoute
+  '/menu': typeof LayoutMenuIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
+  '/orders': typeof LayoutOrdersRoute
+  '/users': typeof LayoutUsersRoute
+  '/': typeof LayoutIndexRoute
+  '/menu/crust': typeof LayoutMenuCrustRoute
+  '/menu/pizza': typeof LayoutMenuPizzaRoute
+  '/menu/size': typeof LayoutMenuSizeRoute
+  '/menu/toppings': typeof LayoutMenuToppingsRoute
+  '/menu': typeof LayoutMenuIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
+  '/_layout': typeof LayoutRouteWithChildren
+  '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
+  '/_layout/orders': typeof LayoutOrdersRoute
+  '/_layout/users': typeof LayoutUsersRoute
+  '/_layout/': typeof LayoutIndexRoute
+  '/_layout/menu/crust': typeof LayoutMenuCrustRoute
+  '/_layout/menu/pizza': typeof LayoutMenuPizzaRoute
+  '/_layout/menu/size': typeof LayoutMenuSizeRoute
+  '/_layout/menu/toppings': typeof LayoutMenuToppingsRoute
+  '/_layout/menu/': typeof LayoutMenuIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/login'
+    | '/register'
+    | '/orders'
+    | '/users'
+    | '/'
+    | '/menu/crust'
+    | '/menu/pizza'
+    | '/menu/size'
+    | '/menu/toppings'
+    | '/menu'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/login'
+    | '/register'
+    | '/orders'
+    | '/users'
+    | '/'
+    | '/menu/crust'
+    | '/menu/pizza'
+    | '/menu/size'
+    | '/menu/toppings'
+    | '/menu'
+  id:
+    | '__root__'
+    | '/_layout'
+    | '/login'
+    | '/register'
+    | '/_layout/orders'
+    | '/_layout/users'
+    | '/_layout/'
+    | '/_layout/menu/crust'
+    | '/_layout/menu/pizza'
+    | '/_layout/menu/size'
+    | '/_layout/menu/toppings'
+    | '/_layout/menu/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
+  LayoutRoute: typeof LayoutRouteWithChildren
+  LoginRoute: typeof LoginRoute
+  RegisterRoute: typeof RegisterRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_layout': {
+      id: '/_layout'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof LayoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_layout/': {
+      id: '/_layout/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof LayoutIndexRouteImport
+      parentRoute: typeof LayoutRoute
+    }
+    '/_layout/users': {
+      id: '/_layout/users'
+      path: '/users'
+      fullPath: '/users'
+      preLoaderRoute: typeof LayoutUsersRouteImport
+      parentRoute: typeof LayoutRoute
+    }
+    '/_layout/orders': {
+      id: '/_layout/orders'
+      path: '/orders'
+      fullPath: '/orders'
+      preLoaderRoute: typeof LayoutOrdersRouteImport
+      parentRoute: typeof LayoutRoute
+    }
+    '/_layout/menu/': {
+      id: '/_layout/menu/'
+      path: '/menu'
+      fullPath: '/menu'
+      preLoaderRoute: typeof LayoutMenuIndexRouteImport
+      parentRoute: typeof LayoutRoute
+    }
+    '/_layout/menu/toppings': {
+      id: '/_layout/menu/toppings'
+      path: '/menu/toppings'
+      fullPath: '/menu/toppings'
+      preLoaderRoute: typeof LayoutMenuToppingsRouteImport
+      parentRoute: typeof LayoutRoute
+    }
+    '/_layout/menu/size': {
+      id: '/_layout/menu/size'
+      path: '/menu/size'
+      fullPath: '/menu/size'
+      preLoaderRoute: typeof LayoutMenuSizeRouteImport
+      parentRoute: typeof LayoutRoute
+    }
+    '/_layout/menu/pizza': {
+      id: '/_layout/menu/pizza'
+      path: '/menu/pizza'
+      fullPath: '/menu/pizza'
+      preLoaderRoute: typeof LayoutMenuPizzaRouteImport
+      parentRoute: typeof LayoutRoute
+    }
+    '/_layout/menu/crust': {
+      id: '/_layout/menu/crust'
+      path: '/menu/crust'
+      fullPath: '/menu/crust'
+      preLoaderRoute: typeof LayoutMenuCrustRouteImport
+      parentRoute: typeof LayoutRoute
     }
   }
 }
 
+interface LayoutRouteChildren {
+  LayoutOrdersRoute: typeof LayoutOrdersRoute
+  LayoutUsersRoute: typeof LayoutUsersRoute
+  LayoutIndexRoute: typeof LayoutIndexRoute
+  LayoutMenuCrustRoute: typeof LayoutMenuCrustRoute
+  LayoutMenuPizzaRoute: typeof LayoutMenuPizzaRoute
+  LayoutMenuSizeRoute: typeof LayoutMenuSizeRoute
+  LayoutMenuToppingsRoute: typeof LayoutMenuToppingsRoute
+  LayoutMenuIndexRoute: typeof LayoutMenuIndexRoute
+}
+
+const LayoutRouteChildren: LayoutRouteChildren = {
+  LayoutOrdersRoute: LayoutOrdersRoute,
+  LayoutUsersRoute: LayoutUsersRoute,
+  LayoutIndexRoute: LayoutIndexRoute,
+  LayoutMenuCrustRoute: LayoutMenuCrustRoute,
+  LayoutMenuPizzaRoute: LayoutMenuPizzaRoute,
+  LayoutMenuSizeRoute: LayoutMenuSizeRoute,
+  LayoutMenuToppingsRoute: LayoutMenuToppingsRoute,
+  LayoutMenuIndexRoute: LayoutMenuIndexRoute,
+}
+
+const LayoutRouteWithChildren =
+  LayoutRoute._addFileChildren(LayoutRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
+  LayoutRoute: LayoutRouteWithChildren,
+  LoginRoute: LoginRoute,
+  RegisterRoute: RegisterRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

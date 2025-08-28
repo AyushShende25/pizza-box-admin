@@ -1,11 +1,12 @@
 import type { QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import {
+	createRootRouteWithContext,
 	Link,
 	Outlet,
-	createRootRouteWithContext,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
+import { Toaster } from "@/components/ui/sonner";
 
 export const Route = createRootRouteWithContext<{
 	queryClient: QueryClient;
@@ -24,8 +25,11 @@ export const Route = createRootRouteWithContext<{
 function RootComponent() {
 	return (
 		<>
-			<Outlet />
-			<ReactQueryDevtools buttonPosition="bottom-left" />
+			<div className="min-h-screen w-full">
+				<Outlet />
+			</div>
+			<Toaster />
+			<ReactQueryDevtools buttonPosition="top-right" />
 			<TanStackRouterDevtools position="bottom-right" />
 		</>
 	);
