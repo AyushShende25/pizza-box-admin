@@ -1,6 +1,9 @@
 import { useForm } from "@tanstack/react-form";
+import { useQuery } from "@tanstack/react-query";
 import * as z from "zod";
+import { fetchToppingsQueryOptions } from "@/api/toppingsApi";
 import FieldInfo from "@/components/FieldInfo";
+import MultiSelect from "@/components/MultiSelect";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,63 +14,69 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import useCreateTopping from "@/hooks/mutations/useCreateTopping";
-import useUpdateTopping from "@/hooks/mutations/useUpdateTopping";
+import useCreatePizza from "@/hooks/mutations/useCreatePizza";
+import useUpdatePizza from "@/hooks/mutations/useUpdatePizza";
 import { handleUpload } from "@/lib/utils";
-import { TOPPING_CATEGORY, TOPPING_TYPE, type Topping } from "@/types/toppings";
+import { PIZZA_CATEGORY, type Pizza } from "@/types/pizza";
 
-const toppingFormSchema = z.object({
-	name: z.string().min(1, "Name is required").max(100),
-	price: z
+type PizzaFormProps = {
+	mode: "create" | "edit";
+	pizza?: Pizza;
+	pizzaId?: string;
+};
+
+const defaultToppingSchema = z.object({ id: z.string(), name: z.string() });
+
+const pizzaFormSchema = z.object({
+	name: z.string().min(1, "name cannot be empty").max(255),
+	description: z.string().min(1, "description cannot be empty"),
+	basePrice: z
 		.number("please enter a valid number")
 		.min(1, "Price must be positive"),
-	description: z.string().optional(),
-	category: z.enum(TOPPING_CATEGORY, "choose the correct field"),
-	type: z.enum(TOPPING_TYPE, "choose the correct field"),
-	toppingImage: z
+	category: z.enum(PIZZA_CATEGORY, "choose the correct field"),
+	pizzaImage: z
 		.file()
 		.max(10 * 1024 * 1024, "max file size allowed is: 10mb")
 		.mime(["image/png", "image/jpeg", "image/webp"], "unsupported file type")
 		.optional(),
+	defaultToppings: z.array(defaultToppingSchema).optional(),
 });
 
-export type ToppingFormType = z.infer<typeof toppingFormSchema>;
+export type PizzaFormType = z.infer<typeof pizzaFormSchema>;
+export type DefaultToppingType = z.infer<typeof defaultToppingSchema>;
 
-type ToppingFormProps = {
-	mode: "create" | "edit";
-	topping?: Topping;
-	toppingId?: string;
-};
-
-function ToppingForm({ mode, topping, toppingId }: ToppingFormProps) {
-	const defaultValues: ToppingFormType = {
-		name: topping?.name ?? "",
-		price: topping?.price ?? 0,
-		description: topping?.description,
-		category: topping?.category ?? TOPPING_CATEGORY.VEGETABLE,
-		type:
-			topping?.is_vegetarian === true ? TOPPING_TYPE.VEG : TOPPING_TYPE.NON_VEG,
-		toppingImage: undefined,
+function PizzaForm({ mode, pizza, pizzaId }: PizzaFormProps) {
+	const defaultValues: PizzaFormType = {
+		name: pizza?.name ?? "",
+		description: pizza?.description ?? "",
+		basePrice: pizza?.base_price ?? 0,
+		category: pizza?.category ?? PIZZA_CATEGORY.VEG,
+		pizzaImage: undefined,
+		defaultToppings: pizza?.default_toppings ?? [],
 	};
 
-	const { createToppingMutation } = useCreateTopping();
-	const { updateToppingMutation } = useUpdateTopping();
+	const { data: toppingData, isPending } = useQuery(
+		fetchToppingsQueryOptions(),
+	);
+
+	const { createPizzaMutation } = useCreatePizza();
+	const { updatePizzaMutation } = useUpdatePizza();
 
 	const form = useForm({
 		defaultValues,
 		validators: {
-			onChange: toppingFormSchema,
+			onChange: pizzaFormSchema,
 			onSubmitAsync: async ({ value, formApi }) => {
 				try {
 					if (mode === "create") {
-						const imgUrl = await handleUpload("topping", value.toppingImage);
-						await createToppingMutation({ data: value, imgUrl });
+						const imgUrl = await handleUpload("pizza", value.pizzaImage);
+						await createPizzaMutation({ data: value, imgUrl });
 					} else {
-						if (!toppingId) throw new Error("topping-id is required for edit");
-						const imgUrl = value.toppingImage
-							? await handleUpload("topping", value.toppingImage)
-							: topping?.image_url;
-						await updateToppingMutation({ data: value, toppingId, imgUrl });
+						if (!pizzaId) throw new Error("pizza-id is required for edit");
+						const imgUrl = value.pizzaImage
+							? await handleUpload("pizza", value.pizzaImage)
+							: pizza?.image_url;
+						await updatePizzaMutation({ data: value, pizzaId, imgUrl });
 					}
 					return undefined;
 					// biome-ignore lint/suspicious/noExplicitAny: <error typing>
@@ -84,7 +93,6 @@ function ToppingForm({ mode, topping, toppingId }: ToppingFormProps) {
 			},
 		},
 	});
-
 	return (
 		<form
 			onSubmit={(e) => {
@@ -116,7 +124,7 @@ function ToppingForm({ mode, topping, toppingId }: ToppingFormProps) {
 							<Label>Description</Label>
 							<Input
 								name={field.name}
-								value={field.state.value ?? ""}
+								value={field.state.value}
 								onBlur={field.handleBlur}
 								type="text"
 								onChange={(e) => field.handleChange(e.target.value)}
@@ -126,10 +134,10 @@ function ToppingForm({ mode, topping, toppingId }: ToppingFormProps) {
 					)}
 				/>
 				<form.Field
-					name="price"
+					name="basePrice"
 					children={(field) => (
 						<div className="grid gap-3">
-							<Label>Price</Label>
+							<Label>Base Price</Label>
 							<Input
 								name={field.name}
 								value={field.state.value}
@@ -142,10 +150,10 @@ function ToppingForm({ mode, topping, toppingId }: ToppingFormProps) {
 					)}
 				/>
 				<form.Field
-					name="toppingImage"
+					name="pizzaImage"
 					children={(field) => (
 						<div className="grid gap-3">
-							<Label>Topping Image</Label>
+							<Label>Pizza Image</Label>
 							<Input
 								name={field.name}
 								onBlur={field.handleBlur}
@@ -160,33 +168,7 @@ function ToppingForm({ mode, topping, toppingId }: ToppingFormProps) {
 					name="category"
 					children={(field) => (
 						<div className="grid gap-3">
-							<Label>Topping category</Label>
-							<Select
-								value={field.state.value}
-								onValueChange={(val) =>
-									field.handleChange(val as typeof field.state.value)
-								}
-							>
-								<SelectTrigger className="w-full">
-									<SelectValue placeholder="Select category" />
-								</SelectTrigger>
-								<SelectContent>
-									{Object.values(TOPPING_CATEGORY).map((item) => (
-										<SelectItem key={item} value={item}>
-											{item}
-										</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
-							<FieldInfo field={field} />
-						</div>
-					)}
-				/>
-				<form.Field
-					name="type"
-					children={(field) => (
-						<div className="grid gap-3">
-							<Label>Topping type</Label>
+							<Label>Pizza type</Label>
 							<Select
 								value={field.state.value}
 								onValueChange={(val) =>
@@ -197,7 +179,7 @@ function ToppingForm({ mode, topping, toppingId }: ToppingFormProps) {
 									<SelectValue placeholder="Select Type" />
 								</SelectTrigger>
 								<SelectContent>
-									{Object.values(TOPPING_TYPE).map((item) => (
+									{Object.values(PIZZA_CATEGORY).map((item) => (
 										<SelectItem key={item} value={item}>
 											{item}
 										</SelectItem>
@@ -208,6 +190,25 @@ function ToppingForm({ mode, topping, toppingId }: ToppingFormProps) {
 						</div>
 					)}
 				/>
+				{!isPending && (
+					<form.Field
+						name="defaultToppings"
+						children={(field) => (
+							<div className="grid gap-3">
+								<Label>Default Toppings</Label>
+								<MultiSelect<DefaultToppingType>
+									options={toppingData ?? []}
+									labelSelector={(t) => t.name}
+									onChange={(selected) => field.handleChange(selected)}
+									selected={field.state.value ?? []}
+									valueSelector={(t) => t.id}
+									placeholder="select toppings"
+								/>
+								<FieldInfo field={field} />
+							</div>
+						)}
+					/>
+				)}
 			</div>
 			<div className="text-center space-y-2">
 				<form.Subscribe
@@ -238,5 +239,4 @@ function ToppingForm({ mode, topping, toppingId }: ToppingFormProps) {
 		</form>
 	);
 }
-
-export default ToppingForm;
+export default PizzaForm;

@@ -28,7 +28,7 @@ export const Route = createFileRoute("/_layout/menu/toppings")({
 function RouteComponent() {
 	const { data } = useSuspenseQuery(fetchToppingsQueryOptions());
 	const { deleteToppingMutation } = useDeleteTopping();
-	const { toggleAvailabilityMutation } = useToggleToppingAvailability();
+	const { toggleToppingAvailabilityMutation } = useToggleToppingAvailability();
 
 	const columns: ColumnDef<Topping>[] = [
 		{
@@ -100,7 +100,7 @@ function RouteComponent() {
 				return (
 					<Switch
 						onCheckedChange={(val) => {
-							toggleAvailabilityMutation({
+							toggleToppingAvailabilityMutation({
 								toppingId: row.original.id,
 								isAvailable: val,
 							});
@@ -150,10 +150,10 @@ function RouteComponent() {
 			{/* Header section */}
 			<div className="space-y-2">
 				<h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
-					Pizza Menu
+					Toppings Menu
 				</h1>
 				<p className="text-sm sm:text-base text-muted-foreground">
-					Manage your pizza offerings and availability.
+					Manage your toppings and availability.
 				</p>
 			</div>
 

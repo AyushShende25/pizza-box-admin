@@ -5,7 +5,7 @@ import type { Topping } from "@/types/toppings";
 function useToggleToppingAvailability() {
 	const queryClient = useQueryClient();
 	const {
-		mutate: toggleAvailabilityMutation,
+		mutate: toggleToppingAvailabilityMutation,
 		isPending,
 		isError,
 		error,
@@ -17,7 +17,6 @@ function useToggleToppingAvailability() {
 			toppingId: string;
 			isAvailable: boolean;
 		}) => toppingsApi.toggleAvailability(toppingId, isAvailable),
-
 		onMutate: async ({ toppingId, isAvailable }) => {
 			await queryClient.cancelQueries({ queryKey: ["toppings"] });
 
@@ -33,17 +32,15 @@ function useToggleToppingAvailability() {
 
 			return { previousToppings };
 		},
-
 		onError: (_err, _variables, context) => {
 			queryClient.setQueryData(["toppings"], context?.previousToppings);
 		},
-
 		onSettled: () => {
 			queryClient.invalidateQueries({
 				queryKey: ["toppings"],
 			});
 		},
 	});
-	return { toggleAvailabilityMutation, isPending, isError, error };
+	return { toggleToppingAvailabilityMutation, isPending, isError, error };
 }
 export default useToggleToppingAvailability;

@@ -1,3 +1,5 @@
+import type { Topping } from "./toppings";
+
 export type Pizza = {
 	id: string;
 	name: string;
@@ -6,7 +8,7 @@ export type Pizza = {
 	image_url: string;
 	is_available: boolean;
 	category: PizzaCategory;
-	default_toppings: string[];
+	default_toppings: Topping[];
 	created_at: string;
 	updated_at: string;
 };
