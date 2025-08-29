@@ -20,7 +20,6 @@ export const toppingsApi = {
 		toppingFormInput: ToppingFormType,
 		imgUrl?: string,
 	): Promise<Topping> => {
-		// biome-ignore lint/correctness/noUnusedVariables: <we don't need to send image to the backend only img-url>
 		const { type, toppingImage, ...rest } = toppingFormInput;
 		const is_vegetarian = type === "veg";
 		const res = await api.post("/menu/toppings", {
@@ -35,7 +34,6 @@ export const toppingsApi = {
 		toppingUpdateData: ToppingFormType,
 		imgUrl?: string,
 	) => {
-		// biome-ignore lint/correctness/noUnusedVariables: <we don't need to send image to the backend only img-url>
 		const { type, toppingImage, ...rest } = toppingUpdateData;
 		const is_vegetarian = type === "veg";
 		const res = await api.patch(`/menu/toppings/${toppingId}`, {
