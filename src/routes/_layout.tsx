@@ -1,10 +1,20 @@
-import { createFileRoute, Outlet } from "@tanstack/react-router";
+import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { fetchCurrentUserOptions } from "@/api/authApi";
 import AppSidebar from "@/components/app-sidebar";
 import Logo from "@/components/Logo";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 
 export const Route = createFileRoute("/_layout")({
 	component: RouteComponent,
+	beforeLoad: async ({ context }) => {
+		const user = await context.queryClient.ensureQueryData(
+			fetchCurrentUserOptions(),
+		);
+
+		if (!user || user.role !== "admin") {
+			throw redirect({ to: "/login" });
+		}
+	},
 });
 
 function RouteComponent() {

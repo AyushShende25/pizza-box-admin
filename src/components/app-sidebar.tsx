@@ -20,6 +20,7 @@ import {
 	SidebarMenu,
 	SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import useLogout from "@/hooks/mutations/useLogout";
 import type { MenuItem } from "@/types/nav";
 
 export const menu: MenuItem[] = [
@@ -40,6 +41,7 @@ export const menu: MenuItem[] = [
 ];
 
 function AppSidebar() {
+	const { logoutMutation } = useLogout();
 	return (
 		<Sidebar>
 			<SidebarContent>
@@ -59,7 +61,8 @@ function AppSidebar() {
 				<Button
 					size="sm"
 					variant="outline"
-					className="w-full justify-start gap-4"
+					className="w-full justify-start gap-4 cursor-pointer"
+					onClick={() => logoutMutation()}
 				>
 					<LogOut />
 					Sign Out
