@@ -7,9 +7,9 @@
     "start": "vite --port 3000",
     "build": "vite build && tsc",
     "serve": "vite preview",
-    "format": "npx @biomejs/biome format --write .",
-    "lint": "npx @biomejs/biome lint --write .",
-    "check": "npx @biomejs/biome check --write ."
+    "format": "npx @biomejs/biome format --write",
+    "lint": "npx @biomejs/biome lint --write",
+    "check": "npx @biomejs/biome check --write"
   },
   "dependencies": {
     "@radix-ui/react-collapsible": "^1.1.12",

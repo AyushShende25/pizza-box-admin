@@ -1,7 +1,8 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import type { ColumnDef } from "@tanstack/react-table";
+import type { ColumnDef, PaginationState } from "@tanstack/react-table";
 import { SquarePen, Trash2 } from "lucide-react";
+import { useState } from "react";
 import { fetchPizzasQueryOptions } from "@/api/pizzasApi";
 import { DataTable } from "@/components/data-table";
 import PizzaForm from "@/components/PizzaForm";
@@ -21,12 +22,24 @@ import { PIZZA_CATEGORY, type Pizza } from "@/types/pizza";
 export const Route = createFileRoute("/_layout/menu/pizza")({
 	component: RouteComponent,
 	loader: async ({ context }) => {
-		await context.queryClient.ensureQueryData(fetchPizzasQueryOptions());
+		await context.queryClient.ensureQueryData(
+			fetchPizzasQueryOptions({ page: 1, limit: 2 }),
+		);
 	},
 });
 
 function RouteComponent() {
-	const { data } = useSuspenseQuery(fetchPizzasQueryOptions());
+	const [pagination, setPagination] = useState<PaginationState>({
+		pageIndex: 0,
+		pageSize: 2,
+	});
+
+	const { data } = useSuspenseQuery(
+		fetchPizzasQueryOptions({
+			page: pagination.pageIndex + 1,
+			limit: pagination.pageSize,
+		}),
+	);
 
 	const { togglePizzaAvailabilityMutation } = useTogglePizzaAvailability();
 	const { deletePizzaMutation } = useDeletePizza();
@@ -79,7 +92,8 @@ function RouteComponent() {
 			accessorKey: "base_price",
 			header: "Price",
 			cell: ({ row }) => {
-				const price = row.original.base_price;
+				const price = Number(row.original.base_price);
+
 				return (
 					<span className="font-medium whitespace-nowrap">
 						${price.toFixed(2)}
@@ -121,7 +135,9 @@ function RouteComponent() {
 		{
 			id: "actions",
 			cell: ({ row }) => {
-				const currentPizza = data.find((pizza) => pizza.id === row.original.id);
+				const currentPizza = data?.items?.find(
+					(pizza) => pizza.id === row.original.id,
+				);
 				return (
 					<div className="flex gap-4">
 						<Trash2
@@ -165,7 +181,13 @@ function RouteComponent() {
 			<div>
 				<div className="overflow-x-auto">
 					<div className="min-w-[640px]">
-						<DataTable columns={columns} data={data} />
+						<DataTable
+							columns={columns}
+							data={data}
+							pageCount={data?.pages}
+							pagination={pagination}
+							setPagination={setPagination}
+						/>
 					</div>
 				</div>
 			</div>

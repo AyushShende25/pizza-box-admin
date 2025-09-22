@@ -53,10 +53,10 @@ function RouteComponent() {
 			accessorKey: "multiplier",
 			header: "Multiplier",
 			cell: ({ row }) => {
-				const price = row.original.multiplier;
+				const multiplier = Number(row.original.multiplier);
 				return (
 					<span className="font-medium whitespace-nowrap">
-						x{price.toFixed(2)}
+						x{multiplier.toFixed(2)}
 					</span>
 				);
 			},

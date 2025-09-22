@@ -53,7 +53,7 @@ function RouteComponent() {
 			accessorKey: "additional_price",
 			header: "Price",
 			cell: ({ row }) => {
-				const price = row.original.additional_price;
+				const price = Number(row.original.additional_price);
 				return (
 					<span className="font-medium whitespace-nowrap">
 						${price.toFixed(2)}

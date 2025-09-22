@@ -1,18 +1,55 @@
-import { queryOptions } from "@tanstack/react-query";
+import { keepPreviousData, queryOptions } from "@tanstack/react-query";
 import { api } from "@/api/axios";
 import type { PizzaFormType } from "@/components/PizzaForm";
-import type { Pizza } from "@/types/pizza";
+import type { Pizza, PizzaCategory } from "@/types/pizza";
 
+type PizzaListResponse = {
+	items: Pizza[];
+	total: number;
+	page: number;
+	pages: number;
+	limit: number;
+};
+
+type FetchPizzaProps = {
+	page?: number;
+	limit?: number;
+	sortBy?: string;
+	name?: string;
+	category?: PizzaCategory;
+	isAvailable?: boolean;
+};
 export const pizzasApi = {
-	fetchAllPizzas: async (): Promise<Pizza[]> => {
-		const res = await api.get("/menu/pizzas");
+	fetchAllPizzas: async ({
+		limit,
+		page,
+		sortBy,
+		category,
+		name,
+		isAvailable,
+	}: FetchPizzaProps = {}): Promise<PizzaListResponse> => {
+		const query = new URLSearchParams({
+			...(limit && { limit: String(limit) }),
+			...(page !== undefined && { page: String(page) }),
+			...(sortBy && { sort_by: sortBy }),
+			...(category && { category }),
+			...(name && { name }),
+			...(isAvailable !== undefined && { is_available: String(isAvailable) }),
+		});
+		const res = await api.get(`/menu/pizzas?${query}`);
+		console.log(res.data);
 		return res.data;
 	},
 	createPizza: async (
 		pizzaFormData: PizzaFormType,
 		imgUrl?: string,
 	): Promise<Pizza> => {
-		const { basePrice, pizzaImage, defaultToppings, ...rest } = pizzaFormData;
+		const {
+			basePrice,
+			pizzaImage: _,
+			defaultToppings,
+			...rest
+		} = pizzaFormData;
 		const res = await api.post("/menu/pizzas", {
 			...rest,
 			base_price: basePrice,
@@ -26,7 +63,12 @@ export const pizzasApi = {
 		pizzaUpdateData: PizzaFormType,
 		imgUrl?: string,
 	) => {
-		const { basePrice, pizzaImage, defaultToppings, ...rest } = pizzaUpdateData;
+		const {
+			basePrice,
+			pizzaImage: _,
+			defaultToppings,
+			...rest
+		} = pizzaUpdateData;
 		const res = await api.patch(`/menu/pizzas/${pizzaId}`, {
 			...rest,
 			base_price: basePrice,
@@ -46,9 +88,10 @@ export const pizzasApi = {
 	},
 };
 
-export const fetchPizzasQueryOptions = () =>
+export const fetchPizzasQueryOptions = (fetchPizzaProps?: FetchPizzaProps) =>
 	queryOptions({
-		queryKey: ["pizzas"],
-		queryFn: () => pizzasApi.fetchAllPizzas(),
+		queryKey: ["pizzas", fetchPizzaProps ?? {}],
+		queryFn: () => pizzasApi.fetchAllPizzas(fetchPizzaProps),
 		staleTime: Number.POSITIVE_INFINITY,
+		placeholderData: keepPreviousData,
 	});
