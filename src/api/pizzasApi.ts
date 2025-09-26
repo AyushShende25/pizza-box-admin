@@ -1,24 +1,8 @@
 import { keepPreviousData, queryOptions } from "@tanstack/react-query";
 import { api } from "@/api/axios";
 import type { PizzaFormType } from "@/components/PizzaForm";
-import type { Pizza, PizzaCategory } from "@/types/pizza";
+import type { FetchPizzaProps, Pizza, PizzaListResponse } from "@/types/pizza";
 
-type PizzaListResponse = {
-	items: Pizza[];
-	total: number;
-	page: number;
-	pages: number;
-	limit: number;
-};
-
-type FetchPizzaProps = {
-	page?: number;
-	limit?: number;
-	sortBy?: string;
-	name?: string;
-	category?: PizzaCategory;
-	isAvailable?: boolean;
-};
 export const pizzasApi = {
 	fetchAllPizzas: async ({
 		limit,
@@ -83,6 +67,12 @@ export const pizzasApi = {
 	toggleAvailability: async (pizzaId: string, isAvailable: boolean) => {
 		const res = await api.patch(`/menu/pizzas/${pizzaId}`, {
 			is_available: isAvailable,
+		});
+		return res.data;
+	},
+	toggleIsFeatured: async (pizzaId: string, isFeatured: boolean) => {
+		const res = await api.patch(`/menu/pizzas/${pizzaId}`, {
+			featured: isFeatured,
 		});
 		return res.data;
 	},

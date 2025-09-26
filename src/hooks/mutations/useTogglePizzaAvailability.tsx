@@ -1,7 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-
 import { pizzasApi } from "@/api/pizzasApi";
-import type { Pizza } from "@/types/pizza";
+import type { FetchPizzaProps, PizzaListResponse } from "@/types/pizza";
 
 function useTogglePizzaAvailability() {
 	const queryClient = useQueryClient();
@@ -17,26 +16,36 @@ function useTogglePizzaAvailability() {
 		}: {
 			pizzaId: string;
 			isAvailable: boolean;
+			queryParams?: FetchPizzaProps;
 		}) => pizzasApi.toggleAvailability(pizzaId, isAvailable),
-		onMutate: async ({ pizzaId, isAvailable }) => {
-			await queryClient.cancelQueries({ queryKey: ["pizzas"] });
+		onMutate: async ({ pizzaId, isAvailable, queryParams }) => {
+			const queryKey = ["pizzas", queryParams ?? {}];
+			await queryClient.cancelQueries({ queryKey });
 
-			const previousPizzas = queryClient.getQueryData<Pizza[]>(["pizzas"]);
+			const previousData =
+				queryClient.getQueryData<PizzaListResponse>(queryKey);
 
-			queryClient.setQueryData<Pizza[]>(["pizzas"], (old) =>
-				old?.map((i) =>
-					i.id === pizzaId ? { ...i, is_available: isAvailable } : i,
-				),
-			);
+			if (previousData) {
+				queryClient.setQueryData<PizzaListResponse>(queryKey, {
+					...previousData,
+					items: previousData.items.map((pizza) =>
+						pizza.id === pizzaId
+							? { ...pizza, is_available: isAvailable }
+							: pizza,
+					),
+				});
+			}
 
-			return { previousPizzas };
+			return { previousData, queryKey };
 		},
 		onError: (_err, _variables, context) => {
-			queryClient.setQueryData(["pizzas"], context?.previousPizzas);
+			if (context?.previousData && context?.queryKey) {
+				queryClient.setQueryData(context.queryKey, context.previousData);
+			}
 		},
-		onSettled: () => {
+		onSettled: (_data, _err, { queryParams }) => {
 			queryClient.invalidateQueries({
-				queryKey: ["pizzas"],
+				queryKey: ["pizzas", queryParams ?? {}],
 			});
 		},
 	});

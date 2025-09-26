@@ -17,13 +17,14 @@ import {
 import { Switch } from "@/components/ui/switch";
 import useDeletePizza from "@/hooks/mutations/useDeletePizza";
 import useTogglePizzaAvailability from "@/hooks/mutations/useTogglePizzaAvailability";
+import useTogglePizzaFeatured from "@/hooks/mutations/useTogglePizzaFeatured";
 import { PIZZA_CATEGORY, type Pizza } from "@/types/pizza";
 
 export const Route = createFileRoute("/_layout/menu/pizza")({
 	component: RouteComponent,
 	loader: async ({ context }) => {
 		await context.queryClient.ensureQueryData(
-			fetchPizzasQueryOptions({ page: 1, limit: 2 }),
+			fetchPizzasQueryOptions({ page: 1, limit: 4 }),
 		);
 	},
 });
@@ -31,7 +32,7 @@ export const Route = createFileRoute("/_layout/menu/pizza")({
 function RouteComponent() {
 	const [pagination, setPagination] = useState<PaginationState>({
 		pageIndex: 0,
-		pageSize: 2,
+		pageSize: 4,
 	});
 
 	const { data } = useSuspenseQuery(
@@ -42,6 +43,7 @@ function RouteComponent() {
 	);
 
 	const { togglePizzaAvailabilityMutation } = useTogglePizzaAvailability();
+	const { togglePizzaFeaturedMutation } = useTogglePizzaFeatured();
 	const { deletePizzaMutation } = useDeletePizza();
 
 	const columns: ColumnDef<Pizza>[] = [
@@ -96,7 +98,7 @@ function RouteComponent() {
 
 				return (
 					<span className="font-medium whitespace-nowrap">
-						${price.toFixed(2)}
+						₹{price.toFixed(2)}
 					</span>
 				);
 			},
@@ -115,6 +117,28 @@ function RouteComponent() {
 			),
 		},
 		{
+			accessorKey: "featured",
+			header: "Featured",
+			cell: ({ row }) => {
+				const isFeatured = row.original.featured;
+				return (
+					<Switch
+						onCheckedChange={(val) => {
+							togglePizzaFeaturedMutation({
+								pizzaId: row.original.id,
+								isFeatured: val,
+								queryParams: {
+									page: pagination.pageIndex + 1,
+									limit: pagination.pageSize,
+								},
+							});
+						}}
+						checked={isFeatured}
+					/>
+				);
+			},
+		},
+		{
 			accessorKey: "is_available",
 			header: "Availability",
 			cell: ({ row }) => {
@@ -125,6 +149,10 @@ function RouteComponent() {
 							togglePizzaAvailabilityMutation({
 								pizzaId: row.original.id,
 								isAvailable: val,
+								queryParams: {
+									page: pagination.pageIndex + 1,
+									limit: pagination.pageSize,
+								},
 							});
 						}}
 						checked={isAvailable}
@@ -142,7 +170,24 @@ function RouteComponent() {
 					<div className="flex gap-4">
 						<Trash2
 							className="cursor-pointer text-destructive w-4 h-4"
-							onClick={() => deletePizzaMutation(row.original.id)}
+							onClick={() =>
+								deletePizzaMutation({
+									pizzaId: row.original.id,
+									queryParams: {
+										page: pagination.pageIndex + 1,
+										limit: pagination.pageSize,
+									},
+									onPageRedirect: () => {
+										// Only redirect if we're not on page 1 and this is the last item
+										if (pagination.pageIndex > 0 && data?.items?.length === 1) {
+											setPagination((prev) => ({
+												...prev,
+												pageIndex: prev.pageIndex - 1,
+											}));
+										}
+									},
+								})
+							}
 						/>
 						<Dialog>
 							<DialogTrigger>

@@ -2,22 +2,23 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { pizzasApi } from "@/api/pizzasApi";
 import type { FetchPizzaProps, PizzaListResponse } from "@/types/pizza";
 
-function useDeletePizza() {
+function useTogglePizzaFeatured() {
 	const queryClient = useQueryClient();
 	const {
-		mutate: deletePizzaMutation,
+		mutate: togglePizzaFeaturedMutation,
 		isPending,
 		isError,
 		error,
 	} = useMutation({
 		mutationFn: ({
 			pizzaId,
+			isFeatured,
 		}: {
 			pizzaId: string;
+			isFeatured: boolean;
 			queryParams?: FetchPizzaProps;
-			onPageRedirect?: () => void;
-		}) => pizzasApi.deletePizza(pizzaId),
-		onMutate: async ({ pizzaId, queryParams, onPageRedirect }) => {
+		}) => pizzasApi.toggleIsFeatured(pizzaId, isFeatured),
+		onMutate: async ({ pizzaId, isFeatured, queryParams }) => {
 			const queryKey = ["pizzas", queryParams ?? {}];
 			await queryClient.cancelQueries({ queryKey });
 
@@ -25,19 +26,12 @@ function useDeletePizza() {
 				queryClient.getQueryData<PizzaListResponse>(queryKey);
 
 			if (previousData) {
-				const newItems = previousData.items.filter(
-					(pizza) => pizza.id !== pizzaId,
-				);
-				const currentPage = queryParams?.page ?? 1;
-
 				queryClient.setQueryData<PizzaListResponse>(queryKey, {
 					...previousData,
-					items: newItems,
+					items: previousData.items.map((pizza) =>
+						pizza.id === pizzaId ? { ...pizza, featured: isFeatured } : pizza,
+					),
 				});
-				// Handle redirect if last item on non-first page
-				if (newItems.length === 0 && currentPage > 1 && onPageRedirect) {
-					onPageRedirect();
-				}
 			}
 
 			return { previousData, queryKey };
@@ -47,12 +41,12 @@ function useDeletePizza() {
 				queryClient.setQueryData(context.queryKey, context.previousData);
 			}
 		},
-		onSettled: () => {
+		onSettled: (_data, _err, { queryParams }) => {
 			queryClient.invalidateQueries({
-				queryKey: ["pizzas"],
+				queryKey: ["pizzas", queryParams ?? {}],
 			});
 		},
 	});
-	return { isError, isPending, error, deletePizzaMutation };
+	return { togglePizzaFeaturedMutation, isPending, isError, error };
 }
-export default useDeletePizza;
+export default useTogglePizzaFeatured;

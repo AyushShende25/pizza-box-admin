@@ -70,7 +70,7 @@ function RouteComponent() {
 				const price = Number(row.original.price);
 				return (
 					<span className="font-medium whitespace-nowrap">
-						${price.toFixed(2)}
+						₹{price.toFixed(2)}
 					</span>
 				);
 			},

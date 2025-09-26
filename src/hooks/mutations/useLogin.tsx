@@ -14,9 +14,6 @@ function useLogin() {
 	} = useMutation({
 		mutationFn: (data: LoginFormType) => authApi.login(data),
 		onSuccess: async () => {
-			// queryClient.invalidateQueries({
-			// 	queryKey: ["me"],
-			// });
 			await queryClient.cancelQueries({ queryKey: ["me"] });
 			queryClient.removeQueries({ queryKey: ["me"], exact: true });
 
