@@ -53,7 +53,7 @@ function RouteComponent() {
 			accessorKey: "additional_price",
 			header: "Price",
 			cell: ({ row }) => {
-				const price = Number(row.original.additional_price);
+				const price = Number(row.original.additionalPrice);
 				return (
 					<span className="font-medium whitespace-nowrap">
 						₹{price.toFixed(2)}
@@ -66,7 +66,7 @@ function RouteComponent() {
 			accessorKey: "is_available",
 			header: "Availability",
 			cell: ({ row }) => {
-				const isAvailable = row.original.is_available;
+				const isAvailable = row.original.isAvailable;
 				return (
 					<Switch
 						onCheckedChange={(val) => {

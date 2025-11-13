@@ -25,9 +25,7 @@ function useToggleToppingAvailability() {
 			]);
 
 			queryClient.setQueryData<Topping[]>(["toppings"], (old) =>
-				old?.map((i) =>
-					i.id === toppingId ? { ...i, is_available: isAvailable } : i,
-				),
+				old?.map((i) => (i.id === toppingId ? { ...i, isAvailable } : i)),
 			);
 
 			return { previousToppings };

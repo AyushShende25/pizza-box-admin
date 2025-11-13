@@ -9,21 +9,11 @@ export const sizesApi = {
 		return res.data;
 	},
 	createSize: async (sizeFormData: SizeFormType): Promise<Size> => {
-		const { displayName, sortOrder, ...rest } = sizeFormData;
-		const res = await api.post("/menu/sizes", {
-			...rest,
-			display_name: displayName,
-			sort_order: sortOrder,
-		});
+		const res = await api.post("/menu/sizes", sizeFormData);
 		return res.data;
 	},
 	updateSize: async (sizeId: string, sizeUpdateData: SizeFormType) => {
-		const { displayName, sortOrder, ...rest } = sizeUpdateData;
-		const res = await api.patch(`/menu/sizes/${sizeId}`, {
-			...rest,
-			display_name: displayName,
-			sort_order: sortOrder,
-		});
+		const res = await api.patch(`/menu/sizes/${sizeId}`, sizeUpdateData);
 		return res.data;
 	},
 	deleteSize: async (sizeId: string) => {
@@ -31,7 +21,7 @@ export const sizesApi = {
 	},
 	toggleAvailability: async (sizeId: string, isAvailable: boolean) => {
 		const res = await api.patch(`/menu/sizes/${sizeId}`, {
-			is_available: isAvailable,
+			isAvailable,
 		});
 		return res.data;
 	},

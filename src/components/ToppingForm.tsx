@@ -46,7 +46,7 @@ function ToppingForm({ mode, topping, toppingId }: ToppingFormProps) {
 		description: topping?.description,
 		category: topping?.category ?? TOPPING_CATEGORY.VEGETABLE,
 		type:
-			topping?.is_vegetarian === true ? TOPPING_TYPE.VEG : TOPPING_TYPE.NON_VEG,
+			topping?.isVegetarian === true ? TOPPING_TYPE.VEG : TOPPING_TYPE.NON_VEG,
 		toppingImage: undefined,
 	};
 
@@ -66,7 +66,7 @@ function ToppingForm({ mode, topping, toppingId }: ToppingFormProps) {
 						if (!toppingId) throw new Error("topping-id is required for edit");
 						const imgUrl = value.toppingImage
 							? await handleUpload("topping", value.toppingImage)
-							: topping?.image_url;
+							: topping?.imageUrl;
 						await updateToppingMutation({ data: value, toppingId, imgUrl });
 					}
 					return undefined;

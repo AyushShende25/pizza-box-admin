@@ -35,8 +35,7 @@ function RouteComponent() {
 			accessorKey: "image_url",
 			header: "Image",
 			cell: ({ row }) => {
-				const imgUrl = row.original.image_url;
-				if (!imgUrl) {
+				if (!row.original.imageUrl) {
 					return (
 						<div className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-100 rounded flex items-center justify-center flex-shrink-0">
 							<span className="text-xs text-gray-500">No img</span>
@@ -46,7 +45,7 @@ function RouteComponent() {
 				return (
 					<div className="w-10 h-10 sm:w-12 sm:h-12 rounded overflow-hidden flex-shrink-0">
 						<img
-							src={imgUrl}
+							src={row.original.imageUrl}
 							className="w-full h-full object-cover"
 							alt={`${row.original.name} pizza`}
 						/>
@@ -84,7 +83,7 @@ function RouteComponent() {
 			header: "Type",
 			cell: ({ row }) => (
 				<span>
-					{row.original.is_vegetarian === true ? (
+					{row.original.isVegetarian === true ? (
 						<Badge className="bg-green-600">Veg</Badge>
 					) : (
 						<Badge variant="destructive">Non-Veg</Badge>
@@ -96,7 +95,6 @@ function RouteComponent() {
 			accessorKey: "is_available",
 			header: "Availability",
 			cell: ({ row }) => {
-				const isAvailable = row.original.is_available;
 				return (
 					<Switch
 						onCheckedChange={(val) => {
@@ -105,7 +103,7 @@ function RouteComponent() {
 								isAvailable: val,
 							});
 						}}
-						checked={isAvailable}
+						checked={row.original.isAvailable}
 					/>
 				);
 			},

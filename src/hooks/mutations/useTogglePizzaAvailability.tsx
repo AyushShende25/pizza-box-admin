@@ -29,9 +29,7 @@ function useTogglePizzaAvailability() {
 				queryClient.setQueryData<PizzaListResponse>(queryKey, {
 					...previousData,
 					items: previousData.items.map((pizza) =>
-						pizza.id === pizzaId
-							? { ...pizza, is_available: isAvailable }
-							: pizza,
+						pizza.id === pizzaId ? { ...pizza, isAvailable } : pizza,
 					),
 				});
 			}

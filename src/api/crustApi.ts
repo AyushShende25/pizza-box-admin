@@ -9,21 +9,19 @@ export const crustsApi = {
 		return res.data;
 	},
 	createCrust: async (crustFormData: CrustFormType): Promise<Crust> => {
-		const { price, sortOrder, ...rest } = crustFormData;
+		const { price, ...rest } = crustFormData;
 		const res = await api.post("/menu/crusts", {
 			...rest,
-			additional_price: price,
-			sort_order: sortOrder,
+			additionalPrice: price,
 		});
 		return res.data;
 	},
 	updateCrust: async (crustId: string, crustUpdateData: CrustFormType) => {
-		const { price, sortOrder, ...rest } = crustUpdateData;
+		const { price, ...rest } = crustUpdateData;
 
 		const res = await api.patch(`/menu/crusts/${crustId}`, {
 			...rest,
-			additional_price: price,
-			sort_order: sortOrder,
+			additionalPrice: price,
 		});
 		return res.data;
 	},
@@ -32,7 +30,7 @@ export const crustsApi = {
 	},
 	toggleAvailability: async (crustId: string, isAvailable: boolean) => {
 		const res = await api.patch(`/menu/crusts/${crustId}`, {
-			is_available: isAvailable,
+			isAvailable,
 		});
 		return res.data;
 	},

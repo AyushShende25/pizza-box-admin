@@ -30,8 +30,8 @@ function CrustForm({ mode, crust, crustId }: CrustFormProps) {
 	const defaultValues: CrustFormType = {
 		name: crust?.name ?? "",
 		description: crust?.description,
-		price: crust?.additional_price ?? 0,
-		sortOrder: crust?.sort_order ?? 0,
+		price: crust?.additionalPrice ?? 0,
+		sortOrder: crust?.sortOrder ?? 0,
 	};
 	const { createCrustMutation } = useCreateCrust();
 	const { updateCrustMutation } = useUpdateCrust();

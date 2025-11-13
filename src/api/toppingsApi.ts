@@ -6,12 +6,12 @@ import type { Topping, ToppingCategory } from "@/types/toppings";
 export const toppingsApi = {
 	fetchAllToppings: async (
 		toppingCategory?: ToppingCategory,
-		vegetarian_only?: boolean,
+		vegetarianOnly?: boolean,
 	): Promise<Topping[]> => {
 		const res = await api.get("/menu/toppings", {
 			params: {
 				...(toppingCategory && { category: toppingCategory }),
-				...(vegetarian_only !== undefined && { vegetarian_only }),
+				...(vegetarianOnly !== undefined && { vegetarianOnly }),
 			},
 		});
 		return res.data;
@@ -20,12 +20,12 @@ export const toppingsApi = {
 		toppingFormInput: ToppingFormType,
 		imgUrl?: string,
 	): Promise<Topping> => {
-		const { type, toppingImage, ...rest } = toppingFormInput;
-		const is_vegetarian = type === "veg";
+		const { type, toppingImage: _, ...rest } = toppingFormInput;
+		const isVegetarian = type === "veg";
 		const res = await api.post("/menu/toppings", {
 			...rest,
-			is_vegetarian,
-			image_url: imgUrl,
+			isVegetarian,
+			imgUrl,
 		});
 		return res.data;
 	},
@@ -34,12 +34,12 @@ export const toppingsApi = {
 		toppingUpdateData: ToppingFormType,
 		imgUrl?: string,
 	) => {
-		const { type, toppingImage, ...rest } = toppingUpdateData;
-		const is_vegetarian = type === "veg";
+		const { type, toppingImage: _, ...rest } = toppingUpdateData;
+		const isVegetarian = type === "veg";
 		const res = await api.patch(`/menu/toppings/${toppingId}`, {
 			...rest,
-			is_vegetarian,
-			image_url: imgUrl,
+			isVegetarian,
+			imgUrl,
 		});
 		return res.data;
 	},
@@ -48,7 +48,7 @@ export const toppingsApi = {
 	},
 	toggleAvailability: async (toppingId: string, isAvailable: boolean) => {
 		const res = await api.patch(`/menu/toppings/${toppingId}`, {
-			is_available: isAvailable,
+			isAvailable,
 		});
 		return res.data;
 	},

@@ -19,8 +19,8 @@ export type Topping = {
 	price: number;
 	description: string;
 	category: ToppingCategory;
-	is_vegetarian: boolean;
-	is_available: boolean;
-	image_url: string;
-	created_at: string;
+	isVegetarian: boolean;
+	isAvailable: boolean;
+	imageUrl: string;
+	createdAt: string;
 };

@@ -23,9 +23,7 @@ function useToggleSizeAvailability() {
 			const previousSizes = queryClient.getQueryData<Size[]>(["sizes"]);
 
 			queryClient.setQueryData<Size[]>(["sizes"], (old) =>
-				old?.map((i) =>
-					i.id === sizeId ? { ...i, is_available: isAvailable } : i,
-				),
+				old?.map((i) => (i.id === sizeId ? { ...i, isAvailable } : i)),
 			);
 
 			return { previousSizes };

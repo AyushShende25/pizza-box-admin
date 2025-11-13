@@ -45,7 +45,7 @@ function RouteComponent() {
 			header: "Display Name",
 			cell: ({ row }) => (
 				<div className="font-medium">
-					<div className="truncate">{row.original.display_name}</div>
+					<div className="truncate">{row.original.displayName}</div>
 				</div>
 			),
 		},
@@ -65,7 +65,7 @@ function RouteComponent() {
 			accessorKey: "is_available",
 			header: "Availability",
 			cell: ({ row }) => {
-				const isAvailable = row.original.is_available;
+				const isAvailable = row.original.isAvailable;
 				return (
 					<Switch
 						onCheckedChange={(val) => {

@@ -66,7 +66,7 @@ function MultiSelect<T>({
 			</div>
 
 			{isOpen && (
-				<ul className="absolute bg-card shadow border mt-1 rounded-md p-1 w-full z-20">
+				<ul className="absolute bg-card shadow border mt-1 rounded-md p-1 w-full z-20 max-h-48 overflow-y-auto">
 					{options.map((item) => (
 						<li
 							key={valueSelector(item)}

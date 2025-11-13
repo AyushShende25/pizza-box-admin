@@ -49,7 +49,6 @@ export function DataTable<TData, TValue>({
 		state: pagination ? { pagination } : {},
 		onPaginationChange: pagination && setPagination ? setPagination : undefined,
 	});
-	console.log(table.getPageCount());
 
 	return (
 		<div>

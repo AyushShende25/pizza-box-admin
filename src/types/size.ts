@@ -1,9 +1,9 @@
 export type Size = {
 	name: string;
-	display_name: string;
+	displayName: string;
 	multiplier: number;
-	is_available: boolean;
-	sort_order: number;
+	isAvailable: boolean;
+	sortOrder: number;
 	id: string;
-	created_at: string;
+	createdAt: string;
 };

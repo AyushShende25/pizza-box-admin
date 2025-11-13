@@ -12,7 +12,6 @@ import {
 import type { MenuItem } from "@/types/nav";
 
 function SidebarNavLink({ item }: { item: MenuItem }) {
-	// If the item has children, render a collapsible menu
 	if (item.children && item.children.length > 0) {
 		return (
 			<Collapsible defaultOpen className="group/collapsible">
@@ -49,7 +48,6 @@ function SidebarNavLink({ item }: { item: MenuItem }) {
 		);
 	}
 
-	// If no children, render a simple menu item
 	return (
 		<SidebarMenuButton
 			className="data-[active=true]:bg-primary data-[active=true]:text-primary-foreground"

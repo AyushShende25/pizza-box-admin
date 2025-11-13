@@ -29,9 +29,9 @@ export type SizeFormType = z.infer<typeof sizeFormSchema>;
 function SizeForm({ mode, size, sizeId }: SizeFormProps) {
 	const defaultValues: SizeFormType = {
 		name: size?.name ?? "",
-		displayName: size?.display_name ?? "",
+		displayName: size?.displayName ?? "",
 		multiplier: size?.multiplier ?? 0,
-		sortOrder: size?.sort_order ?? 0,
+		sortOrder: size?.sortOrder ?? 0,
 	};
 
 	const { createSizeMutation } = useCreateSize();

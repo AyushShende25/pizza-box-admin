@@ -15,30 +15,23 @@ export const pizzasApi = {
 		const query = new URLSearchParams({
 			...(limit && { limit: String(limit) }),
 			...(page !== undefined && { page: String(page) }),
-			...(sortBy && { sort_by: sortBy }),
+			...(sortBy && { sortBy }),
 			...(category && { category }),
 			...(name && { name }),
-			...(isAvailable !== undefined && { is_available: String(isAvailable) }),
+			...(isAvailable !== undefined && { isAvailable: String(isAvailable) }),
 		});
 		const res = await api.get(`/menu/pizzas?${query}`);
-		console.log(res.data);
 		return res.data;
 	},
 	createPizza: async (
 		pizzaFormData: PizzaFormType,
 		imgUrl?: string,
 	): Promise<Pizza> => {
-		const {
-			basePrice,
-			pizzaImage: _,
-			defaultToppings,
-			...rest
-		} = pizzaFormData;
+		const { pizzaImage: _, defaultToppings, ...rest } = pizzaFormData;
 		const res = await api.post("/menu/pizzas", {
 			...rest,
-			base_price: basePrice,
 			default_topping_ids: defaultToppings?.map((t) => t.id),
-			image_url: imgUrl,
+			imgUrl,
 		});
 		return res.data;
 	},
@@ -47,17 +40,11 @@ export const pizzasApi = {
 		pizzaUpdateData: PizzaFormType,
 		imgUrl?: string,
 	) => {
-		const {
-			basePrice,
-			pizzaImage: _,
-			defaultToppings,
-			...rest
-		} = pizzaUpdateData;
+		const { pizzaImage: _, defaultToppings, ...rest } = pizzaUpdateData;
 		const res = await api.patch(`/menu/pizzas/${pizzaId}`, {
 			...rest,
-			base_price: basePrice,
 			default_topping_ids: defaultToppings?.map((t) => t.id),
-			image_url: imgUrl,
+			imgUrl,
 		});
 		return res.data;
 	},
@@ -66,7 +53,7 @@ export const pizzasApi = {
 	},
 	toggleAvailability: async (pizzaId: string, isAvailable: boolean) => {
 		const res = await api.patch(`/menu/pizzas/${pizzaId}`, {
-			is_available: isAvailable,
+			isAvailable,
 		});
 		return res.data;
 	},

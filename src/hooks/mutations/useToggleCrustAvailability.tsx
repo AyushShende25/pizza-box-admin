@@ -23,9 +23,7 @@ function useToggleCrustAvailability() {
 			const previousCrusts = queryClient.getQueryData<Crust[]>(["crusts"]);
 
 			queryClient.setQueryData<Crust[]>(["crusts"], (old) =>
-				old?.map((i) =>
-					i.id === crustId ? { ...i, is_available: isAvailable } : i,
-				),
+				old?.map((i) => (i.id === crustId ? { ...i, isAvailable } : i)),
 			);
 
 			return { previousCrusts };

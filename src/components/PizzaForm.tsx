@@ -49,10 +49,10 @@ function PizzaForm({ mode, pizza, pizzaId }: PizzaFormProps) {
 	const defaultValues: PizzaFormType = {
 		name: pizza?.name ?? "",
 		description: pizza?.description ?? "",
-		basePrice: pizza?.base_price ?? 0,
+		basePrice: pizza?.basePrice ?? 0,
 		category: pizza?.category ?? PIZZA_CATEGORY.VEG,
 		pizzaImage: undefined,
-		defaultToppings: pizza?.default_toppings ?? [],
+		defaultToppings: pizza?.defaultToppings ?? [],
 	};
 
 	const { data: toppingData, isPending } = useQuery(
@@ -75,7 +75,7 @@ function PizzaForm({ mode, pizza, pizzaId }: PizzaFormProps) {
 						if (!pizzaId) throw new Error("pizza-id is required for edit");
 						const imgUrl = value.pizzaImage
 							? await handleUpload("pizza", value.pizzaImage)
-							: pizza?.image_url;
+							: pizza?.imageUrl;
 						await updatePizzaMutation({ data: value, pizzaId, imgUrl });
 					}
 					return undefined;
