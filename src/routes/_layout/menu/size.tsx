@@ -2,7 +2,11 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import type { ColumnDef } from "@tanstack/react-table";
 import { SquarePen, Trash2 } from "lucide-react";
-import { fetchSizesQueryOptions } from "@/api/sizeApi";
+import {
+	fetchSizesQueryOptions,
+	useDeleteSize,
+	useToggleSizeAvailability,
+} from "@/api/sizeApi";
 import { DataTable } from "@/components/data-table";
 import SizeForm from "@/components/SizeForm";
 import {
@@ -13,8 +17,6 @@ import {
 	DialogTrigger,
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
-import useDeleteSize from "@/hooks/mutations/useDeleteSize";
-import useToggleSizeAvailability from "@/hooks/mutations/useToggleSizeAvailability";
 import type { Size } from "@/types/size";
 
 export const Route = createFileRoute("/_layout/menu/size")({
@@ -27,8 +29,8 @@ export const Route = createFileRoute("/_layout/menu/size")({
 function RouteComponent() {
 	const { data } = useSuspenseQuery(fetchSizesQueryOptions());
 
-	const { toggleSizeAvailabilityMutation } = useToggleSizeAvailability();
-	const { deleteSizeMutation } = useDeleteSize();
+	const toggleSizeAvailabilityMutation = useToggleSizeAvailability();
+	const deleteSizeMutation = useDeleteSize();
 
 	const columns: ColumnDef<Size>[] = [
 		{
@@ -69,7 +71,7 @@ function RouteComponent() {
 				return (
 					<Switch
 						onCheckedChange={(val) => {
-							toggleSizeAvailabilityMutation({
+							toggleSizeAvailabilityMutation.mutateAsync({
 								sizeId: row.original.id,
 								isAvailable: val,
 							});
@@ -87,7 +89,7 @@ function RouteComponent() {
 					<div className="flex gap-4">
 						<Trash2
 							className="cursor-pointer text-destructive w-4 h-4"
-							onClick={() => deleteSizeMutation(row.original.id)}
+							onClick={() => deleteSizeMutation.mutateAsync(row.original.id)}
 						/>
 						<Dialog>
 							<DialogTrigger>

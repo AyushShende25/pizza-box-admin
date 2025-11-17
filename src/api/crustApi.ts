@@ -1,4 +1,9 @@
-import { queryOptions } from "@tanstack/react-query";
+import {
+	queryOptions,
+	useMutation,
+	useQueryClient,
+} from "@tanstack/react-query";
+import { toast } from "sonner";
 import { api } from "@/api/axios";
 import type { CrustFormType } from "@/components/CrustForm";
 import type { Crust } from "@/types/crust";
@@ -42,3 +47,89 @@ export const fetchCrustsQueryOptions = () =>
 		queryFn: () => crustsApi.fetchAllCrusts(),
 		staleTime: Number.POSITIVE_INFINITY,
 	});
+
+export function useCreateCrust() {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: (data: CrustFormType) => crustsApi.createCrust(data),
+		onSuccess: () => {
+			queryClient.invalidateQueries({
+				queryKey: ["crusts"],
+			});
+			toast.success("new crust added");
+		},
+	});
+}
+
+export function useDeleteCrust() {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: (crustId: string) => crustsApi.deleteCrust(crustId),
+		onMutate: async (crustId) => {
+			await queryClient.cancelQueries({ queryKey: ["crusts"] });
+
+			const previousCrusts = queryClient.getQueryData<Crust[]>(["crusts"]);
+
+			queryClient.setQueryData<Crust[]>(["crusts"], (old) =>
+				old?.filter((i) => i.id !== crustId),
+			);
+
+			return { previousCrusts };
+		},
+		onError: (_err, _variables, context) => {
+			queryClient.setQueryData(["crusts"], context?.previousCrusts);
+		},
+		onSettled: () => {
+			queryClient.invalidateQueries({
+				queryKey: ["crusts"],
+			});
+		},
+	});
+}
+
+export function useToggleCrustAvailability() {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: ({
+			crustId,
+			isAvailable,
+		}: {
+			crustId: string;
+			isAvailable: boolean;
+		}) => crustsApi.toggleAvailability(crustId, isAvailable),
+		onMutate: async ({ crustId, isAvailable }) => {
+			await queryClient.cancelQueries({ queryKey: ["crusts"] });
+
+			const previousCrusts = queryClient.getQueryData<Crust[]>(["crusts"]);
+
+			queryClient.setQueryData<Crust[]>(["crusts"], (old) =>
+				old?.map((i) => (i.id === crustId ? { ...i, isAvailable } : i)),
+			);
+
+			return { previousCrusts };
+		},
+		onError: (_err, _variables, context) => {
+			queryClient.setQueryData(["crusts"], context?.previousCrusts);
+		},
+		onSettled: () => {
+			queryClient.invalidateQueries({
+				queryKey: ["crusts"],
+			});
+		},
+	});
+}
+
+export function useUpdateCrust() {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: ({ data, crustId }: { data: CrustFormType; crustId: string }) =>
+			crustsApi.updateCrust(crustId, data),
+		onSuccess: () => {
+			queryClient.invalidateQueries({
+				queryKey: ["crusts"],
+			});
+			toast.success("crust update successful");
+		},
+	});
+}

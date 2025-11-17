@@ -2,7 +2,11 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import type { ColumnDef } from "@tanstack/react-table";
 import { SquarePen, Trash2 } from "lucide-react";
-import { fetchCrustsQueryOptions } from "@/api/crustApi";
+import {
+	fetchCrustsQueryOptions,
+	useDeleteCrust,
+	useToggleCrustAvailability,
+} from "@/api/crustApi";
 import CrustForm from "@/components/CrustForm";
 import { DataTable } from "@/components/data-table";
 import {
@@ -13,8 +17,6 @@ import {
 	DialogTrigger,
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
-import useDeleteCrust from "@/hooks/mutations/useDeleteCrust";
-import useToggleCrustAvailability from "@/hooks/mutations/useToggleCrustAvailability";
 import type { Crust } from "@/types/crust";
 
 export const Route = createFileRoute("/_layout/menu/crust")({
@@ -26,9 +28,8 @@ export const Route = createFileRoute("/_layout/menu/crust")({
 
 function RouteComponent() {
 	const { data } = useSuspenseQuery(fetchCrustsQueryOptions());
-
-	const { toggleCrustAvailabilityMutation } = useToggleCrustAvailability();
-	const { deleteCrustMutation } = useDeleteCrust();
+	const toggleCrustAvailabilityMutation = useToggleCrustAvailability();
+	const deleteCrustMutation = useDeleteCrust();
 	const columns: ColumnDef<Crust>[] = [
 		{
 			accessorKey: "name",
@@ -70,7 +71,7 @@ function RouteComponent() {
 				return (
 					<Switch
 						onCheckedChange={(val) => {
-							toggleCrustAvailabilityMutation({
+							toggleCrustAvailabilityMutation.mutateAsync({
 								crustId: row.original.id,
 								isAvailable: val,
 							});
@@ -88,7 +89,7 @@ function RouteComponent() {
 					<div className="flex gap-4">
 						<Trash2
 							className="cursor-pointer text-destructive w-4 h-4"
-							onClick={() => deleteCrustMutation(row.original.id)}
+							onClick={() => deleteCrustMutation.mutateAsync(row.original.id)}
 						/>
 						<Dialog>
 							<DialogTrigger>

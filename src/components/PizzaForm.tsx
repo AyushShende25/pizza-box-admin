@@ -1,6 +1,7 @@
 import { useForm } from "@tanstack/react-form";
 import { useQuery } from "@tanstack/react-query";
 import * as z from "zod";
+import { useCreatePizza, useUpdatePizza } from "@/api/pizzasApi";
 import { fetchToppingsQueryOptions } from "@/api/toppingsApi";
 import FieldInfo from "@/components/FieldInfo";
 import MultiSelect from "@/components/MultiSelect";
@@ -14,8 +15,6 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import useCreatePizza from "@/hooks/mutations/useCreatePizza";
-import useUpdatePizza from "@/hooks/mutations/useUpdatePizza";
 import { handleUpload } from "@/lib/utils";
 import { PIZZA_CATEGORY, type Pizza } from "@/types/pizza";
 
@@ -59,8 +58,8 @@ function PizzaForm({ mode, pizza, pizzaId }: PizzaFormProps) {
 		fetchToppingsQueryOptions(),
 	);
 
-	const { createPizzaMutation } = useCreatePizza();
-	const { updatePizzaMutation } = useUpdatePizza();
+	const createPizzaMutation = useCreatePizza();
+	const updatePizzaMutation = useUpdatePizza();
 
 	const form = useForm({
 		defaultValues,
@@ -70,13 +69,17 @@ function PizzaForm({ mode, pizza, pizzaId }: PizzaFormProps) {
 				try {
 					if (mode === "create") {
 						const imgUrl = await handleUpload("pizza", value.pizzaImage);
-						await createPizzaMutation({ data: value, imgUrl });
+						await createPizzaMutation.mutateAsync({ data: value, imgUrl });
 					} else {
 						if (!pizzaId) throw new Error("pizza-id is required for edit");
 						const imgUrl = value.pizzaImage
 							? await handleUpload("pizza", value.pizzaImage)
 							: pizza?.imageUrl;
-						await updatePizzaMutation({ data: value, pizzaId, imgUrl });
+						await updatePizzaMutation.mutateAsync({
+							data: value,
+							pizzaId,
+							imgUrl,
+						});
 					}
 					return undefined;
 					// biome-ignore lint/suspicious/noExplicitAny: <error typing>

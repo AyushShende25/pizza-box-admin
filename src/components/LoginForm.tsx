@@ -1,5 +1,6 @@
 import { useForm } from "@tanstack/react-form";
 import * as z from "zod";
+import { useLogin } from "@/api/authApi";
 import FieldInfo from "@/components/FieldInfo";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,7 +12,6 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import useLogin from "@/hooks/mutations/useLogin";
 import { cn } from "@/lib/utils";
 
 const loginFormSchema = z.object({
@@ -24,7 +24,7 @@ export default function LoginForm({
 	className,
 	...props
 }: React.ComponentProps<"div">) {
-	const { loginMutation } = useLogin();
+	const loginMutation = useLogin();
 
 	const form = useForm({
 		defaultValues: { email: "", password: "" },
@@ -32,7 +32,7 @@ export default function LoginForm({
 			onChange: loginFormSchema,
 			onSubmitAsync: async ({ value }) => {
 				try {
-					await loginMutation(value);
+					await loginMutation.mutateAsync(value);
 					return undefined;
 					// biome-ignore lint/suspicious/noExplicitAny: <error typing>
 				} catch (error: any) {

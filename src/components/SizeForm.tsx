@@ -1,11 +1,10 @@
 import { useForm } from "@tanstack/react-form";
 import * as z from "zod";
+import { useCreateSize, useUpdateSize } from "@/api/sizeApi";
 import FieldInfo from "@/components/FieldInfo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import useCreateSize from "@/hooks/mutations/useCreateSize";
-import useUpdateSize from "@/hooks/mutations/useUpdateSize";
 import type { Size } from "@/types/size";
 
 type SizeFormProps = {
@@ -34,8 +33,8 @@ function SizeForm({ mode, size, sizeId }: SizeFormProps) {
 		sortOrder: size?.sortOrder ?? 0,
 	};
 
-	const { createSizeMutation } = useCreateSize();
-	const { updateSizeMutation } = useUpdateSize();
+	const createSizeMutation = useCreateSize();
+	const updateSizeMutation = useUpdateSize();
 
 	const form = useForm({
 		defaultValues,
@@ -44,10 +43,10 @@ function SizeForm({ mode, size, sizeId }: SizeFormProps) {
 			onSubmitAsync: async ({ value, formApi }) => {
 				try {
 					if (mode === "create") {
-						await createSizeMutation(value);
+						await createSizeMutation.mutateAsync(value);
 					} else {
 						if (!sizeId) throw new Error("size-id is required for edit");
-						await updateSizeMutation({ data: value, sizeId });
+						await updateSizeMutation.mutateAsync({ data: value, sizeId });
 					}
 					return undefined;
 					// biome-ignore lint/suspicious/noExplicitAny: <error typing>

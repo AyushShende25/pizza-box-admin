@@ -2,7 +2,11 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import type { ColumnDef } from "@tanstack/react-table";
 import { SquarePen, Trash2 } from "lucide-react";
-import { fetchToppingsQueryOptions } from "@/api/toppingsApi";
+import {
+	fetchToppingsQueryOptions,
+	useDeleteTopping,
+	useToggleToppingAvailability,
+} from "@/api/toppingsApi";
 import { DataTable } from "@/components/data-table";
 import ToppingForm from "@/components/ToppingForm";
 import { Badge } from "@/components/ui/badge";
@@ -14,8 +18,7 @@ import {
 	DialogTrigger,
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
-import useDeleteTopping from "@/hooks/mutations/useDeleteTopping";
-import useToggleToppingAvailability from "@/hooks/mutations/useToggleToppingAvailability";
+
 import type { Topping } from "@/types/toppings";
 
 export const Route = createFileRoute("/_layout/menu/toppings")({
@@ -27,8 +30,8 @@ export const Route = createFileRoute("/_layout/menu/toppings")({
 
 function RouteComponent() {
 	const { data } = useSuspenseQuery(fetchToppingsQueryOptions());
-	const { deleteToppingMutation } = useDeleteTopping();
-	const { toggleToppingAvailabilityMutation } = useToggleToppingAvailability();
+	const deleteToppingMutation = useDeleteTopping();
+	const toggleToppingAvailabilityMutation = useToggleToppingAvailability();
 
 	const columns: ColumnDef<Topping>[] = [
 		{
@@ -98,7 +101,7 @@ function RouteComponent() {
 				return (
 					<Switch
 						onCheckedChange={(val) => {
-							toggleToppingAvailabilityMutation({
+							toggleToppingAvailabilityMutation.mutateAsync({
 								toppingId: row.original.id,
 								isAvailable: val,
 							});
@@ -118,7 +121,7 @@ function RouteComponent() {
 				return (
 					<div className="flex gap-4">
 						<Trash2
-							onClick={() => deleteToppingMutation(row.original.id)}
+							onClick={() => deleteToppingMutation.mutateAsync(row.original.id)}
 							className="cursor-pointer text-destructive w-4 h-4"
 						/>
 

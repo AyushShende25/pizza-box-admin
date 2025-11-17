@@ -9,6 +9,7 @@ import {
 	Users,
 	UtensilsCrossed,
 } from "lucide-react";
+import { useLogout } from "@/api/authApi";
 import SidebarNavLink from "@/components/SidebarNavlink";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,7 +21,6 @@ import {
 	SidebarMenu,
 	SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import useLogout from "@/hooks/mutations/useLogout";
 import type { MenuItem } from "@/types/nav";
 
 export const menu: MenuItem[] = [
@@ -41,7 +41,7 @@ export const menu: MenuItem[] = [
 ];
 
 function AppSidebar() {
-	const { logoutMutation } = useLogout();
+	const logoutMutation = useLogout();
 	return (
 		<Sidebar>
 			<SidebarContent>
@@ -62,7 +62,7 @@ function AppSidebar() {
 					size="sm"
 					variant="outline"
 					className="w-full justify-start gap-4 cursor-pointer"
-					onClick={() => logoutMutation()}
+					onClick={() => logoutMutation.mutateAsync()}
 				>
 					<LogOut />
 					Sign Out

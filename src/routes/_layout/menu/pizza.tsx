@@ -3,7 +3,12 @@ import { createFileRoute } from "@tanstack/react-router";
 import type { ColumnDef, PaginationState } from "@tanstack/react-table";
 import { SquarePen, Trash2 } from "lucide-react";
 import { useState } from "react";
-import { fetchPizzasQueryOptions } from "@/api/pizzasApi";
+import {
+	fetchPizzasQueryOptions,
+	useDeletePizza,
+	useTogglePizzaAvailability,
+	useTogglePizzaFeatured,
+} from "@/api/pizzasApi";
 import { DataTable } from "@/components/data-table";
 import PizzaForm from "@/components/PizzaForm";
 import { Badge } from "@/components/ui/badge";
@@ -15,9 +20,6 @@ import {
 	DialogTrigger,
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
-import useDeletePizza from "@/hooks/mutations/useDeletePizza";
-import useTogglePizzaAvailability from "@/hooks/mutations/useTogglePizzaAvailability";
-import useTogglePizzaFeatured from "@/hooks/mutations/useTogglePizzaFeatured";
 import { PIZZA_CATEGORY, type Pizza } from "@/types/pizza";
 
 export const Route = createFileRoute("/_layout/menu/pizza")({
@@ -42,9 +44,9 @@ function RouteComponent() {
 		}),
 	);
 
-	const { togglePizzaAvailabilityMutation } = useTogglePizzaAvailability();
-	const { togglePizzaFeaturedMutation } = useTogglePizzaFeatured();
-	const { deletePizzaMutation } = useDeletePizza();
+	const togglePizzaAvailabilityMutation = useTogglePizzaAvailability();
+	const togglePizzaFeaturedMutation = useTogglePizzaFeatured();
+	const deletePizzaMutation = useDeletePizza();
 
 	const columns: ColumnDef<Pizza>[] = [
 		{
@@ -123,7 +125,7 @@ function RouteComponent() {
 				return (
 					<Switch
 						onCheckedChange={(val) => {
-							togglePizzaFeaturedMutation({
+							togglePizzaFeaturedMutation.mutateAsync({
 								pizzaId: row.original.id,
 								isFeatured: val,
 								queryParams: {
@@ -145,7 +147,7 @@ function RouteComponent() {
 				return (
 					<Switch
 						onCheckedChange={(val) => {
-							togglePizzaAvailabilityMutation({
+							togglePizzaAvailabilityMutation.mutateAsync({
 								pizzaId: row.original.id,
 								isAvailable: val,
 								queryParams: {
@@ -170,7 +172,7 @@ function RouteComponent() {
 						<Trash2
 							className="cursor-pointer text-destructive w-4 h-4"
 							onClick={() =>
-								deletePizzaMutation({
+								deletePizzaMutation.mutateAsync({
 									pizzaId: row.original.id,
 									queryParams: {
 										page: pagination.pageIndex + 1,

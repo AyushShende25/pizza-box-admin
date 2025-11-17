@@ -1,5 +1,6 @@
 import { useForm } from "@tanstack/react-form";
 import * as z from "zod";
+import { useCreateTopping, useUpdateTopping } from "@/api/toppingsApi";
 import FieldInfo from "@/components/FieldInfo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,8 +12,6 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import useCreateTopping from "@/hooks/mutations/useCreateTopping";
-import useUpdateTopping from "@/hooks/mutations/useUpdateTopping";
 import { handleUpload } from "@/lib/utils";
 import { TOPPING_CATEGORY, TOPPING_TYPE, type Topping } from "@/types/toppings";
 
@@ -50,8 +49,8 @@ function ToppingForm({ mode, topping, toppingId }: ToppingFormProps) {
 		toppingImage: undefined,
 	};
 
-	const { createToppingMutation } = useCreateTopping();
-	const { updateToppingMutation } = useUpdateTopping();
+	const createToppingMutation = useCreateTopping();
+	const updateToppingMutation = useUpdateTopping();
 
 	const form = useForm({
 		defaultValues,
@@ -61,13 +60,17 @@ function ToppingForm({ mode, topping, toppingId }: ToppingFormProps) {
 				try {
 					if (mode === "create") {
 						const imgUrl = await handleUpload("topping", value.toppingImage);
-						await createToppingMutation({ data: value, imgUrl });
+						await createToppingMutation.mutateAsync({ data: value, imgUrl });
 					} else {
 						if (!toppingId) throw new Error("topping-id is required for edit");
 						const imgUrl = value.toppingImage
 							? await handleUpload("topping", value.toppingImage)
 							: topping?.imageUrl;
-						await updateToppingMutation({ data: value, toppingId, imgUrl });
+						await updateToppingMutation.mutateAsync({
+							data: value,
+							toppingId,
+							imgUrl,
+						});
 					}
 					return undefined;
 					// biome-ignore lint/suspicious/noExplicitAny: <error typing>

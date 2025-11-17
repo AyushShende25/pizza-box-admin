@@ -1,4 +1,9 @@
-import { queryOptions } from "@tanstack/react-query";
+import {
+	queryOptions,
+	useMutation,
+	useQueryClient,
+} from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
 import { api } from "@/api/axios";
 import type { LoginFormType } from "@/components/LoginForm";
 import type { User } from "@/types/user";
@@ -54,3 +59,33 @@ api.interceptors.response.use(
 		return Promise.reject(error);
 	},
 );
+
+export function useLogin() {
+	const queryClient = useQueryClient();
+	const navigate = useNavigate();
+	return useMutation({
+		mutationFn: (data: LoginFormType) => authApi.login(data),
+		onSuccess: async () => {
+			await queryClient.cancelQueries({ queryKey: ["me"] });
+			queryClient.removeQueries({ queryKey: ["me"], exact: true });
+
+			const user = await queryClient.fetchQuery(fetchCurrentUserOptions());
+			queryClient.setQueryData(["me"], user);
+
+			navigate({ to: "/", replace: true });
+		},
+	});
+}
+
+export function useLogout() {
+	const queryClient = useQueryClient();
+	const navigate = useNavigate();
+
+	return useMutation({
+		mutationFn: authApi.logout,
+		onSettled: () => {
+			queryClient.clear();
+			navigate({ to: "/login" });
+		},
+	});
+}

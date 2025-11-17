@@ -1,11 +1,10 @@
 import { useForm } from "@tanstack/react-form";
 import * as z from "zod";
+import { useCreateCrust, useUpdateCrust } from "@/api/crustApi";
 import FieldInfo from "@/components/FieldInfo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import useCreateCrust from "@/hooks/mutations/useCreateCrust";
-import useUpdateCrust from "@/hooks/mutations/useUpdateCrust";
 import type { Crust } from "@/types/crust";
 
 type CrustFormProps = {
@@ -33,8 +32,8 @@ function CrustForm({ mode, crust, crustId }: CrustFormProps) {
 		price: crust?.additionalPrice ?? 0,
 		sortOrder: crust?.sortOrder ?? 0,
 	};
-	const { createCrustMutation } = useCreateCrust();
-	const { updateCrustMutation } = useUpdateCrust();
+	const createCrustMutation = useCreateCrust();
+	const updateCrustMutation = useUpdateCrust();
 	const form = useForm({
 		defaultValues,
 		validators: {
@@ -42,10 +41,10 @@ function CrustForm({ mode, crust, crustId }: CrustFormProps) {
 			onSubmitAsync: async ({ value, formApi }) => {
 				try {
 					if (mode === "create") {
-						await createCrustMutation(value);
+						await createCrustMutation.mutateAsync(value);
 					} else {
 						if (!crustId) throw new Error("crust-id is required for edit");
-						await updateCrustMutation({ data: value, crustId });
+						await updateCrustMutation.mutateAsync({ data: value, crustId });
 					}
 					return undefined;
 					// biome-ignore lint/suspicious/noExplicitAny: <error typing>

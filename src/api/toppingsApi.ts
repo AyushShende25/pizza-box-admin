@@ -1,4 +1,9 @@
-import { queryOptions } from "@tanstack/react-query";
+import {
+	queryOptions,
+	useMutation,
+	useQueryClient,
+} from "@tanstack/react-query";
+import { toast } from "sonner";
 import { api } from "@/api/axios";
 import type { ToppingFormType } from "@/components/ToppingForm";
 import type { Topping, ToppingCategory } from "@/types/toppings";
@@ -60,3 +65,101 @@ export const fetchToppingsQueryOptions = () =>
 		queryFn: () => toppingsApi.fetchAllToppings(),
 		staleTime: Number.POSITIVE_INFINITY,
 	});
+
+export function useCreateTopping() {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: ({ data, imgUrl }: { data: ToppingFormType; imgUrl: string }) =>
+			toppingsApi.createTopping(data, imgUrl),
+		onSuccess: () => {
+			queryClient.invalidateQueries({
+				queryKey: ["toppings"],
+			});
+			toast.success("new topping added");
+		},
+	});
+}
+
+export function useDeleteTopping() {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: (toppingId: string) => toppingsApi.deleteTopping(toppingId),
+		onMutate: async (toppingId) => {
+			await queryClient.cancelQueries({ queryKey: ["toppings"] });
+
+			const previousToppings = queryClient.getQueryData<Topping[]>([
+				"toppings",
+			]);
+
+			queryClient.setQueryData<Topping[]>(["toppings"], (old) =>
+				old?.filter((i) => i.id !== toppingId),
+			);
+
+			return { previousToppings };
+		},
+		onError: (_err, _variables, context) => {
+			queryClient.setQueryData(["toppings"], context?.previousToppings);
+		},
+		onSettled: () => {
+			queryClient.invalidateQueries({
+				queryKey: ["toppings"],
+			});
+		},
+	});
+}
+
+export function useToggleToppingAvailability() {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: ({
+			toppingId,
+			isAvailable,
+		}: {
+			toppingId: string;
+			isAvailable: boolean;
+		}) => toppingsApi.toggleAvailability(toppingId, isAvailable),
+		onMutate: async ({ toppingId, isAvailable }) => {
+			await queryClient.cancelQueries({ queryKey: ["toppings"] });
+
+			const previousToppings = queryClient.getQueryData<Topping[]>([
+				"toppings",
+			]);
+
+			queryClient.setQueryData<Topping[]>(["toppings"], (old) =>
+				old?.map((i) => (i.id === toppingId ? { ...i, isAvailable } : i)),
+			);
+
+			return { previousToppings };
+		},
+		onError: (_err, _variables, context) => {
+			queryClient.setQueryData(["toppings"], context?.previousToppings);
+		},
+		onSettled: () => {
+			queryClient.invalidateQueries({
+				queryKey: ["toppings"],
+			});
+		},
+	});
+}
+
+export function useUpdateTopping() {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: ({
+			data,
+			toppingId,
+			imgUrl,
+		}: {
+			data: ToppingFormType;
+			toppingId: string;
+			imgUrl: string;
+		}) => toppingsApi.updateTopping(toppingId, data, imgUrl),
+		onSuccess: () => {
+			queryClient.invalidateQueries({
+				queryKey: ["toppings"],
+			});
+			toast.success("topping update successful");
+		},
+	});
+}
