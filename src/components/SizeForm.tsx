@@ -11,6 +11,7 @@ type SizeFormProps = {
 	mode: "create" | "edit";
 	size?: Size;
 	sizeId?: string;
+	lastSortOrder?: number;
 };
 
 const sizeFormSchema = z.object({
@@ -25,12 +26,12 @@ const sizeFormSchema = z.object({
 });
 export type SizeFormType = z.infer<typeof sizeFormSchema>;
 
-function SizeForm({ mode, size, sizeId }: SizeFormProps) {
+function SizeForm({ mode, size, sizeId, lastSortOrder }: SizeFormProps) {
 	const defaultValues: SizeFormType = {
 		name: size?.name ?? "",
 		displayName: size?.displayName ?? "",
 		multiplier: size?.multiplier ?? 0,
-		sortOrder: size?.sortOrder ?? 0,
+		sortOrder: size?.sortOrder ?? (lastSortOrder ?? 0) + 1,
 	};
 
 	const createSizeMutation = useCreateSize();

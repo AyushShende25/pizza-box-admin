@@ -11,6 +11,7 @@ type CrustFormProps = {
 	mode: "create" | "edit";
 	crust?: Crust;
 	crustId?: string;
+	lastSortOrder?: number;
 };
 
 const crustFormSchema = z.object({
@@ -25,12 +26,12 @@ const crustFormSchema = z.object({
 });
 export type CrustFormType = z.infer<typeof crustFormSchema>;
 
-function CrustForm({ mode, crust, crustId }: CrustFormProps) {
+function CrustForm({ mode, crust, crustId, lastSortOrder }: CrustFormProps) {
 	const defaultValues: CrustFormType = {
 		name: crust?.name ?? "",
 		description: crust?.description,
 		price: crust?.additionalPrice ?? 0,
-		sortOrder: crust?.sortOrder ?? 0,
+		sortOrder: crust?.sortOrder ?? (lastSortOrder ?? 0) + 1,
 	};
 	const createCrustMutation = useCreateCrust();
 	const updateCrustMutation = useUpdateCrust();

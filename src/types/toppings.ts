@@ -24,3 +24,9 @@ export type Topping = {
 	imageUrl: string;
 	createdAt: string;
 };
+
+export type FetchToppingsParams = {
+	category?: ToppingCategory;
+	vegetarianOnly?: boolean;
+	isAvailable?: boolean;
+};

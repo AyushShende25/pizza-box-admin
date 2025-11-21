@@ -1,7 +1,8 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import type { ColumnDef } from "@tanstack/react-table";
-import { SquarePen, Trash2 } from "lucide-react";
+import { SquarePen, Trash2, X } from "lucide-react";
+import { useMemo, useState } from "react";
 import {
 	fetchToppingsQueryOptions,
 	useDeleteTopping,
@@ -10,6 +11,7 @@ import {
 import { DataTable } from "@/components/data-table";
 import ToppingForm from "@/components/ToppingForm";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
 	Dialog,
 	DialogContent,
@@ -17,9 +19,20 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-
-import type { Topping } from "@/types/toppings";
+import {
+	type FetchToppingsParams,
+	TOPPING_CATEGORY,
+	type Topping,
+	type ToppingCategory,
+} from "@/types/toppings";
 
 export const Route = createFileRoute("/_layout/menu/toppings")({
 	component: RouteComponent,
@@ -29,7 +42,45 @@ export const Route = createFileRoute("/_layout/menu/toppings")({
 });
 
 function RouteComponent() {
-	const { data } = useSuspenseQuery(fetchToppingsQueryOptions());
+	const [filters, setFilters] = useState({
+		category: "all",
+		type: "all",
+		availability: "all",
+	});
+
+	const handleFilterChange = (key: keyof typeof filters, value: string) => {
+		setFilters((prev) => ({ ...prev, [key]: value }));
+	};
+
+	const clearFilters = () => {
+		setFilters({
+			category: "all",
+			availability: "all",
+			type: "all",
+		});
+	};
+
+	const hasActiveFilters =
+		filters.category !== "all" ||
+		filters.availability !== "all" ||
+		filters.type !== "all";
+
+	const queryParams: FetchToppingsParams = useMemo(() => {
+		const params: FetchToppingsParams = {};
+
+		if (filters.category !== "all")
+			params.category = filters.category as ToppingCategory;
+
+		if (filters.type !== "all") params.vegetarianOnly = filters.type === "veg";
+
+		if (filters.availability !== "all")
+			params.isAvailable = filters.availability === "available";
+
+		return params;
+	}, [filters]);
+
+	const { data } = useSuspenseQuery(fetchToppingsQueryOptions(queryParams));
+
 	const deleteToppingMutation = useDeleteTopping();
 	const toggleToppingAvailabilityMutation = useToggleToppingAvailability();
 
@@ -156,6 +207,60 @@ function RouteComponent() {
 				<p className="text-sm sm:text-base text-muted-foreground">
 					Manage your toppings and availability.
 				</p>
+			</div>
+
+			<div className="flex flex-col sm:flex-row justify-end gap-4">
+				<Select
+					value={filters.category}
+					onValueChange={(v) => handleFilterChange("category", v)}
+				>
+					<SelectTrigger className="w-[180px]">
+						<SelectValue placeholder="Category" />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value="all">All Categories</SelectItem>
+						{Object.values(TOPPING_CATEGORY).map((c) => (
+							<SelectItem className="capitalize" key={c} value={c}>
+								{c}
+							</SelectItem>
+						))}
+					</SelectContent>
+				</Select>
+
+				<Select
+					value={filters.type}
+					onValueChange={(v) => handleFilterChange("type", v)}
+				>
+					<SelectTrigger className="w-[180px]">
+						<SelectValue placeholder="Type" />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value="all">All Types</SelectItem>
+						<SelectItem value="veg">Vegetarian</SelectItem>
+						<SelectItem value="non_veg">Non-Vegetarian</SelectItem>
+					</SelectContent>
+				</Select>
+
+				<Select
+					value={filters.availability}
+					onValueChange={(v) => handleFilterChange("availability", v)}
+				>
+					<SelectTrigger className="w-[180px]">
+						<SelectValue placeholder="Availability" />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value="all">All</SelectItem>
+						<SelectItem value="available">Available</SelectItem>
+						<SelectItem value="unavailable">Unavailable</SelectItem>
+					</SelectContent>
+				</Select>
+
+				{hasActiveFilters && (
+					<Button onClick={clearFilters} variant="ghost" className="gap-2">
+						<X className="size-4" />
+						Clear Filters
+					</Button>
+				)}
 			</div>
 
 			{/* Table section*/}

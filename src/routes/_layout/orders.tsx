@@ -1,12 +1,30 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import type { ColumnDef, PaginationState } from "@tanstack/react-table";
-import { CircleCheck, CircleX, Eye, Loader } from "lucide-react";
-import { useState } from "react";
+import type {
+	ColumnDef,
+	PaginationState,
+	SortingState,
+} from "@tanstack/react-table";
+import {
+	ArrowUpDown,
+	CircleCheck,
+	CircleX,
+	Eye,
+	Loader,
+	X,
+} from "lucide-react";
+import { useMemo, useState } from "react";
 import { fetchOrdersQueryOptions, useUpdateOrderStatus } from "@/api/ordersApi";
 import { DataTable } from "@/components/data-table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import {
 	Sheet,
@@ -17,7 +35,17 @@ import {
 	SheetTrigger,
 } from "@/components/ui/sheet";
 import { formatStatusLabel } from "@/lib/utils";
-import { ORDER_STATUS, type Order, VALID_TRANSITIONS } from "@/types/orders";
+import {
+	type FetchOrdersParams,
+	ORDER_STATUS,
+	type Order,
+	type OrderStatus,
+	PAYMENT_METHOD,
+	PAYMENT_STATUS,
+	type PaymentMethod,
+	type PaymentStatus,
+	VALID_TRANSITIONS,
+} from "@/types/orders";
 
 export const Route = createFileRoute("/_layout/orders")({
 	component: RouteComponent,
@@ -33,19 +61,73 @@ function RouteComponent() {
 		pageIndex: 0,
 		pageSize: 5,
 	});
-	const updateOrderStatusMutation = useUpdateOrderStatus();
-	const { data: orders } = useSuspenseQuery(
-		fetchOrdersQueryOptions({
+
+	const [sorting, setSorting] = useState<SortingState>([
+		{ id: "created_at", desc: true },
+	]);
+
+	const [filters, setFilters] = useState({
+		orderStatus: "all",
+		paymentStatus: "all",
+		paymentMethod: "all",
+	});
+
+	const handleFilterChange = (key: keyof typeof filters, value: string) => {
+		setFilters((prev) => ({ ...prev, [key]: value }));
+		setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+	};
+
+	const clearFilters = () => {
+		setFilters({
+			orderStatus: "all",
+			paymentStatus: "all",
+			paymentMethod: "all",
+		});
+		setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+	};
+
+	const hasActiveFilters =
+		filters.orderStatus !== "all" ||
+		filters.paymentStatus !== "all" ||
+		filters.paymentMethod !== "all";
+
+	const queryParams: FetchOrdersParams = useMemo(() => {
+		const params: FetchOrdersParams = {
 			page: pagination.pageIndex + 1,
 			limit: pagination.pageSize,
-		}),
+			sortBy: `${sorting[0].id}:${sorting[0].desc ? "desc" : "asc"}`,
+		};
+
+		if (filters.orderStatus !== "all")
+			params.orderStatus = filters.orderStatus as OrderStatus;
+		if (filters.paymentStatus !== "all")
+			params.paymentStatus = filters.paymentStatus as PaymentStatus;
+		if (filters.paymentMethod !== "all")
+			params.paymentMethod = filters.paymentMethod as PaymentMethod;
+
+		return params;
+	}, [filters, pagination, sorting]);
+
+	const updateOrderStatusMutation = useUpdateOrderStatus();
+	const { data: orders } = useSuspenseQuery(
+		fetchOrdersQueryOptions(queryParams),
 	);
 	console.log(orders.items);
 
 	const columns: ColumnDef<Order>[] = [
 		{
 			accessorKey: "orderNo",
-			header: "Ord Num",
+			header: ({ column }) => {
+				return (
+					<Button
+						variant="ghost"
+						onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+					>
+						Order No.
+						<ArrowUpDown className="ml-2 size-4" />
+					</Button>
+				);
+			},
 			cell: ({ row }) => (
 				<div className="font-medium">
 					<div className="truncate">{row.original.orderNo}</div>
@@ -54,7 +136,7 @@ function RouteComponent() {
 		},
 		{
 			accessorKey: "orderStatus",
-			header: "status",
+			header: "Status",
 			cell: ({ row }) => (
 				<div className="font-medium">
 					<Badge variant={"secondary"}>
@@ -72,7 +154,7 @@ function RouteComponent() {
 		},
 		{
 			accessorKey: "paymentStatus",
-			header: "payment-status",
+			header: "Payment-Status",
 			cell: ({ row }) => {
 				const status = row.original.paymentStatus;
 				return (
@@ -102,7 +184,7 @@ function RouteComponent() {
 
 		{
 			accessorKey: "paymentMethod",
-			header: "payment-method",
+			header: "Payment-Method",
 			cell: ({ row }) => (
 				<div className="font-medium">
 					<div className="truncate">{row.original.paymentMethod}</div>
@@ -111,7 +193,17 @@ function RouteComponent() {
 		},
 		{
 			accessorKey: "total",
-			header: "price",
+			header: ({ column }) => {
+				return (
+					<Button
+						variant="ghost"
+						onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+					>
+						Price
+						<ArrowUpDown className="ml-2 size-4" />
+					</Button>
+				);
+			},
 			cell: ({ row }) => (
 				<div className="font-medium">
 					<div className="truncate">₹{row.original.total}</div>
@@ -120,7 +212,17 @@ function RouteComponent() {
 		},
 		{
 			accessorKey: "createdAt",
-			header: "order-date",
+			header: ({ column }) => {
+				return (
+					<Button
+						variant="ghost"
+						onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+					>
+						Date
+						<ArrowUpDown className="ml-2 size-4" />
+					</Button>
+				);
+			},
 			cell: ({ row }) => (
 				<div className="font-medium">
 					<div className="truncate">
@@ -344,6 +446,64 @@ function RouteComponent() {
 				</p>
 			</div>
 
+			<div className="flex flex-col sm:flex-row gap-4 justify-end">
+				<Select
+					value={filters.orderStatus}
+					onValueChange={(v) => handleFilterChange("orderStatus", v)}
+				>
+					<SelectTrigger className="w-[180px]">
+						<SelectValue placeholder="Order-Status" />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value="all">All</SelectItem>
+						{Object.values(ORDER_STATUS).map((s) => (
+							<SelectItem className="capitalize" key={s} value={s}>
+								{s}
+							</SelectItem>
+						))}
+					</SelectContent>
+				</Select>
+				<Select
+					value={filters.paymentStatus}
+					onValueChange={(v) => handleFilterChange("paymentStatus", v)}
+				>
+					<SelectTrigger className="w-[180px]">
+						<SelectValue placeholder="Payment-Status" />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value="all">All</SelectItem>
+						{Object.values(PAYMENT_STATUS).map((p) => (
+							<SelectItem className="capitalize" key={p} value={p}>
+								{p}
+							</SelectItem>
+						))}
+					</SelectContent>
+				</Select>
+				<Select
+					value={filters.paymentMethod}
+					onValueChange={(v) => handleFilterChange("paymentMethod", v)}
+				>
+					<SelectTrigger className="w-[180px]">
+						<SelectValue placeholder="Payment-Method" />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value="all">All</SelectItem>
+						{Object.values(PAYMENT_METHOD).map((p) => (
+							<SelectItem className="capitalize" key={p} value={p}>
+								{p}
+							</SelectItem>
+						))}
+					</SelectContent>
+				</Select>
+
+				{hasActiveFilters && (
+					<Button onClick={clearFilters} variant="ghost" className="gap-2">
+						<X className="size-4" />
+						Clear Filters
+					</Button>
+				)}
+			</div>
+
 			{/* Table section*/}
 			<div>
 				<div className="overflow-x-auto">
@@ -354,6 +514,8 @@ function RouteComponent() {
 							pageCount={orders?.pages}
 							pagination={pagination}
 							setPagination={setPagination}
+							sorting={sorting}
+							setSorting={setSorting}
 						/>
 					</div>
 				</div>

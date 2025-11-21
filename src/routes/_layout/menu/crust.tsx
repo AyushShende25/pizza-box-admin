@@ -32,6 +32,17 @@ function RouteComponent() {
 	const deleteCrustMutation = useDeleteCrust();
 	const columns: ColumnDef<Crust>[] = [
 		{
+			accessorKey: "sortOrder",
+			header: "Order",
+			cell: ({ row }) => {
+				return (
+					<span className="font-medium whitespace-nowrap">
+						{row.original.sortOrder}
+					</span>
+				);
+			},
+		},
+		{
 			accessorKey: "name",
 			header: "Name",
 			cell: ({ row }) => (
@@ -142,7 +153,7 @@ function RouteComponent() {
 						<DialogHeader>
 							<DialogTitle className="mb-2">Add new Crust</DialogTitle>
 						</DialogHeader>
-						<CrustForm mode="create" />
+						<CrustForm mode="create" lastSortOrder={data.at(-1)?.sortOrder} />
 					</DialogContent>
 				</Dialog>
 			</div>

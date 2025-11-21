@@ -34,6 +34,17 @@ function RouteComponent() {
 
 	const columns: ColumnDef<Size>[] = [
 		{
+			accessorKey: "sortOrder",
+			header: "Order",
+			cell: ({ row }) => {
+				return (
+					<span className="font-medium whitespace-nowrap">
+						{row.original.sortOrder}
+					</span>
+				);
+			},
+		},
+		{
 			accessorKey: "name",
 			header: "Name",
 			cell: ({ row }) => (
@@ -143,7 +154,7 @@ function RouteComponent() {
 						<DialogHeader>
 							<DialogTitle className="mb-2">Add new Size</DialogTitle>
 						</DialogHeader>
-						<SizeForm mode="create" />
+						<SizeForm mode="create" lastSortOrder={data.at(-1)?.sortOrder} />
 					</DialogContent>
 				</Dialog>
 			</div>

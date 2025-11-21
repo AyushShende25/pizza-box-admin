@@ -23,12 +23,13 @@ export const PAYMENT_METHOD = { DIGITAL: "digital", COD: "cod" } as const;
 export type PaymentMethod =
 	(typeof PAYMENT_METHOD)[keyof typeof PAYMENT_METHOD];
 
-export type FetchOrdersProps = {
+export type FetchOrdersParams = {
 	page?: number;
 	limit?: number;
 	sortBy?: string;
 	orderStatus?: OrderStatus;
 	paymentStatus?: PaymentStatus;
+	paymentMethod?: PaymentMethod;
 };
 
 export type OrdersListResponse = {

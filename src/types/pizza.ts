@@ -30,11 +30,12 @@ export type PizzaListResponse = {
 	limit: number;
 };
 
-export type FetchPizzaProps = {
+export type FetchPizzaParams = {
 	page?: number;
 	limit?: number;
 	sortBy?: string;
 	name?: string;
 	category?: PizzaCategory;
 	isAvailable?: boolean;
+	featured?: boolean;
 };

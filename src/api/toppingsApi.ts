@@ -1,4 +1,5 @@
 import {
+	keepPreviousData,
 	queryOptions,
 	useMutation,
 	useQueryClient,
@@ -6,18 +7,14 @@ import {
 import { toast } from "sonner";
 import { api } from "@/api/axios";
 import type { ToppingFormType } from "@/components/ToppingForm";
-import type { Topping, ToppingCategory } from "@/types/toppings";
+import type { FetchToppingsParams, Topping } from "@/types/toppings";
 
 export const toppingsApi = {
 	fetchAllToppings: async (
-		toppingCategory?: ToppingCategory,
-		vegetarianOnly?: boolean,
+		fetchToppingsParams: FetchToppingsParams = {},
 	): Promise<Topping[]> => {
 		const res = await api.get("/menu/toppings", {
-			params: {
-				...(toppingCategory && { category: toppingCategory }),
-				...(vegetarianOnly !== undefined && { vegetarianOnly }),
-			},
+			params: fetchToppingsParams,
 		});
 		return res.data;
 	},
@@ -59,11 +56,14 @@ export const toppingsApi = {
 	},
 };
 
-export const fetchToppingsQueryOptions = () =>
+export const fetchToppingsQueryOptions = (
+	fetchToppingsParams?: FetchToppingsParams,
+) =>
 	queryOptions({
-		queryKey: ["toppings"],
-		queryFn: () => toppingsApi.fetchAllToppings(),
+		queryKey: ["toppings", fetchToppingsParams ?? {}],
+		queryFn: () => toppingsApi.fetchAllToppings(fetchToppingsParams),
 		staleTime: Number.POSITIVE_INFINITY,
+		placeholderData: keepPreviousData,
 	});
 
 export function useCreateTopping() {

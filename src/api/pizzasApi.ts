@@ -7,26 +7,15 @@ import {
 import { toast } from "sonner";
 import { api } from "@/api/axios";
 import type { PizzaFormType } from "@/components/PizzaForm";
-import type { FetchPizzaProps, Pizza, PizzaListResponse } from "@/types/pizza";
+import type { FetchPizzaParams, Pizza, PizzaListResponse } from "@/types/pizza";
 
 export const pizzasApi = {
-	fetchAllPizzas: async ({
-		limit,
-		page,
-		sortBy,
-		category,
-		name,
-		isAvailable,
-	}: FetchPizzaProps = {}): Promise<PizzaListResponse> => {
-		const query = new URLSearchParams({
-			...(limit && { limit: String(limit) }),
-			...(page !== undefined && { page: String(page) }),
-			...(sortBy && { sortBy }),
-			...(category && { category }),
-			...(name && { name }),
-			...(isAvailable !== undefined && { isAvailable: String(isAvailable) }),
+	fetchAllPizzas: async (
+		fetchPizzaParams: FetchPizzaParams = {},
+	): Promise<PizzaListResponse> => {
+		const res = await api.get("/menu/pizzas", {
+			params: fetchPizzaParams,
 		});
-		const res = await api.get(`/menu/pizzas?${query}`);
 		return res.data;
 	},
 	createPizza: async (
@@ -71,10 +60,10 @@ export const pizzasApi = {
 	},
 };
 
-export const fetchPizzasQueryOptions = (fetchPizzaProps?: FetchPizzaProps) =>
+export const fetchPizzasQueryOptions = (fetchPizzaParams?: FetchPizzaParams) =>
 	queryOptions({
-		queryKey: ["pizzas", fetchPizzaProps ?? {}],
-		queryFn: () => pizzasApi.fetchAllPizzas(fetchPizzaProps),
+		queryKey: ["pizzas", fetchPizzaParams ?? {}],
+		queryFn: () => pizzasApi.fetchAllPizzas(fetchPizzaParams),
 		staleTime: Number.POSITIVE_INFINITY,
 		placeholderData: keepPreviousData,
 	});
@@ -100,7 +89,7 @@ export function useDeletePizza() {
 			pizzaId,
 		}: {
 			pizzaId: string;
-			queryParams?: FetchPizzaProps;
+			queryParams?: FetchPizzaParams;
 			onPageRedirect?: () => void;
 		}) => pizzasApi.deletePizza(pizzaId),
 		onMutate: async ({ pizzaId, queryParams, onPageRedirect }) => {
@@ -150,7 +139,7 @@ export function useTogglePizzaAvailability() {
 		}: {
 			pizzaId: string;
 			isAvailable: boolean;
-			queryParams?: FetchPizzaProps;
+			queryParams?: FetchPizzaParams;
 		}) => pizzasApi.toggleAvailability(pizzaId, isAvailable),
 		onMutate: async ({ pizzaId, isAvailable, queryParams }) => {
 			const queryKey = ["pizzas", queryParams ?? {}];
@@ -192,7 +181,7 @@ export function useTogglePizzaFeatured() {
 		}: {
 			pizzaId: string;
 			isFeatured: boolean;
-			queryParams?: FetchPizzaProps;
+			queryParams?: FetchPizzaParams;
 		}) => pizzasApi.toggleIsFeatured(pizzaId, isFeatured),
 		onMutate: async ({ pizzaId, isFeatured, queryParams }) => {
 			const queryKey = ["pizzas", queryParams ?? {}];

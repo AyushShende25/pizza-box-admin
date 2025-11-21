@@ -1,8 +1,12 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import type { ColumnDef, PaginationState } from "@tanstack/react-table";
-import { SquarePen, Trash2 } from "lucide-react";
-import { useState } from "react";
+import type {
+	ColumnDef,
+	PaginationState,
+	SortingState,
+} from "@tanstack/react-table";
+import { ArrowUpDown, SquarePen, Trash2, X } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import {
 	fetchPizzasQueryOptions,
 	useDeletePizza,
@@ -12,6 +16,7 @@ import {
 import { DataTable } from "@/components/data-table";
 import PizzaForm from "@/components/PizzaForm";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
 	Dialog,
 	DialogContent,
@@ -19,14 +24,28 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { PIZZA_CATEGORY, type Pizza } from "@/types/pizza";
+import useDebounce from "@/hooks/useDebounce";
+import {
+	type FetchPizzaParams,
+	PIZZA_CATEGORY,
+	type Pizza,
+	type PizzaCategory,
+} from "@/types/pizza";
 
 export const Route = createFileRoute("/_layout/menu/pizza")({
 	component: RouteComponent,
 	loader: async ({ context }) => {
 		await context.queryClient.ensureQueryData(
-			fetchPizzasQueryOptions({ page: 1, limit: 4 }),
+			fetchPizzasQueryOptions({ page: 1, limit: 4, sortBy: "created_at:desc" }),
 		);
 	},
 });
@@ -37,12 +56,67 @@ function RouteComponent() {
 		pageSize: 4,
 	});
 
-	const { data } = useSuspenseQuery(
-		fetchPizzasQueryOptions({
+	const [sorting, setSorting] = useState<SortingState>([
+		{ id: "created_at", desc: true },
+	]);
+
+	const [filters, setFilters] = useState({
+		name: "",
+		category: "all",
+		availability: "all",
+		featured: "all",
+	});
+	const [searchInput, setSearchInput] = useState("");
+	const debouncedSearchInput = useDebounce(searchInput);
+
+	useEffect(() => {
+		setFilters((prev) => ({ ...prev, name: debouncedSearchInput }));
+		setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+	}, [debouncedSearchInput]);
+
+	const handleFilterChange = (key: keyof typeof filters, value: string) => {
+		setFilters((prev) => ({ ...prev, [key]: value }));
+		setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+	};
+
+	const clearFilters = () => {
+		setFilters({
+			name: "",
+			category: "all",
+			availability: "all",
+			featured: "all",
+		});
+		setSearchInput("");
+		setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+	};
+
+	const hasActiveFilters =
+		filters.name.trim() ||
+		filters.category !== "all" ||
+		filters.availability !== "all" ||
+		filters.featured !== "all";
+
+	const queryParams: FetchPizzaParams = useMemo(() => {
+		const params: FetchPizzaParams = {
 			page: pagination.pageIndex + 1,
 			limit: pagination.pageSize,
-		}),
-	);
+			sortBy: `${sorting[0].id}:${sorting[0].desc ? "desc" : "asc"}`,
+		};
+
+		if (filters.name.trim()) params.name = filters.name.trim();
+		if (filters.category !== "all")
+			params.category = filters.category as PizzaCategory;
+
+		if (filters.availability !== "all")
+			params.isAvailable = filters.availability === "available";
+
+		if (filters.featured !== "all")
+			params.featured = filters.featured === "featured";
+
+		return params;
+	}, [filters, pagination, sorting]);
+
+	const { data } = useSuspenseQuery(fetchPizzasQueryOptions(queryParams));
 
 	const togglePizzaAvailabilityMutation = useTogglePizzaAvailability();
 	const togglePizzaFeaturedMutation = useTogglePizzaFeatured();
@@ -73,7 +147,17 @@ function RouteComponent() {
 		},
 		{
 			accessorKey: "name",
-			header: "Name",
+			header: ({ column }) => {
+				return (
+					<Button
+						variant="ghost"
+						onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+					>
+						Name
+						<ArrowUpDown className="ml-2 size-4" />
+					</Button>
+				);
+			},
 			cell: ({ row }) => (
 				<div className="font-medium">
 					<div className="truncate">{row.original.name}</div>
@@ -93,7 +177,17 @@ function RouteComponent() {
 		},
 		{
 			accessorKey: "base_price",
-			header: "Price",
+			header: ({ column }) => {
+				return (
+					<Button
+						variant="ghost"
+						onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+					>
+						Price
+						<ArrowUpDown className="ml-2 size-4" />
+					</Button>
+				);
+			},
 			cell: ({ row }) => {
 				const price = Number(row.original.basePrice);
 
@@ -106,7 +200,17 @@ function RouteComponent() {
 		},
 		{
 			accessorKey: "category",
-			header: "Type",
+			header: ({ column }) => {
+				return (
+					<Button
+						variant="ghost"
+						onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+					>
+						Type
+						<ArrowUpDown className="ml-2 size-4" />
+					</Button>
+				);
+			},
 			cell: ({ row }) => (
 				<span>
 					{row.original.category === PIZZA_CATEGORY.VEG ? (
@@ -119,7 +223,17 @@ function RouteComponent() {
 		},
 		{
 			accessorKey: "featured",
-			header: "Featured",
+			header: ({ column }) => {
+				return (
+					<Button
+						variant="ghost"
+						onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+					>
+						Featured
+						<ArrowUpDown className="ml-2 size-4" />
+					</Button>
+				);
+			},
 			cell: ({ row }) => {
 				const isFeatured = row.original.featured;
 				return (
@@ -141,7 +255,17 @@ function RouteComponent() {
 		},
 		{
 			accessorKey: "is_available",
-			header: "Availability",
+			header: ({ column }) => {
+				return (
+					<Button
+						variant="ghost"
+						onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+					>
+						Availability
+						<ArrowUpDown className="ml-2 size-4" />
+					</Button>
+				);
+			},
 			cell: ({ row }) => {
 				const isAvailable = row.original.isAvailable;
 				return (
@@ -223,6 +347,66 @@ function RouteComponent() {
 				</p>
 			</div>
 
+			<div className="flex flex-col sm:flex-row gap-4 justify-end">
+				<Input
+					placeholder="Search by name..."
+					className="max-w-sm"
+					value={searchInput}
+					onChange={(e) => setSearchInput(e.target.value)}
+				/>
+
+				<Select
+					value={filters.category}
+					onValueChange={(value) => handleFilterChange("category", value)}
+				>
+					<SelectTrigger className="w-[180px]">
+						<SelectValue placeholder="Category" />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value="all">All Categories</SelectItem>
+						<SelectItem value={PIZZA_CATEGORY.VEG}>Vegetarian</SelectItem>
+						<SelectItem value={PIZZA_CATEGORY.NONVEG}>
+							Non-Vegetarian
+						</SelectItem>
+					</SelectContent>
+				</Select>
+
+				<Select
+					value={filters.availability}
+					onValueChange={(value) => handleFilterChange("availability", value)}
+				>
+					<SelectTrigger className="w-[180px]">
+						<SelectValue placeholder="Availability" />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value="all">All</SelectItem>
+						<SelectItem value="available">Available</SelectItem>
+						<SelectItem value="unavailable">Unavailable</SelectItem>
+					</SelectContent>
+				</Select>
+
+				<Select
+					value={filters.featured}
+					onValueChange={(value) => handleFilterChange("featured", value)}
+				>
+					<SelectTrigger className="w-[180px]">
+						<SelectValue placeholder="Featured" />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value="all">All</SelectItem>
+						<SelectItem value="featured">Featured</SelectItem>
+						<SelectItem value="not-featured">Not Featured</SelectItem>
+					</SelectContent>
+				</Select>
+
+				{hasActiveFilters && (
+					<Button onClick={clearFilters} variant="ghost" className="gap-2">
+						<X className="size-4" />
+						Clear Filters
+					</Button>
+				)}
+			</div>
+
 			{/* Table section*/}
 			<div>
 				<div className="overflow-x-auto">
@@ -233,6 +417,8 @@ function RouteComponent() {
 							pageCount={data?.pages}
 							pagination={pagination}
 							setPagination={setPagination}
+							sorting={sorting}
+							setSorting={setSorting}
 						/>
 					</div>
 				</div>

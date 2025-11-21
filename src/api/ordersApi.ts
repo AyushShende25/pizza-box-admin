@@ -7,7 +7,7 @@ import {
 import type { AxiosError } from "axios";
 import { toast } from "sonner";
 import type {
-	FetchOrdersProps,
+	FetchOrdersParams,
 	OrderStatus,
 	OrdersListResponse,
 } from "@/types/orders";
@@ -15,9 +15,9 @@ import { api } from "./axios";
 
 export const ordersApi = {
 	fetchOrders: async (
-		fetchOrderProps: FetchOrdersProps = {},
+		fetchOrderParams: FetchOrdersParams = {},
 	): Promise<OrdersListResponse> => {
-		const res = await api.get("/orders", { params: fetchOrderProps });
+		const res = await api.get("/orders", { params: fetchOrderParams });
 		return res.data;
 	},
 	updateOrderStatus: async ({
@@ -34,10 +34,10 @@ export const ordersApi = {
 	},
 };
 
-export const fetchOrdersQueryOptions = (fetchOrderProps?: FetchOrdersProps) =>
+export const fetchOrdersQueryOptions = (fetchOrderParams?: FetchOrdersParams) =>
 	queryOptions({
-		queryKey: ["orders", fetchOrderProps ?? {}],
-		queryFn: () => ordersApi.fetchOrders(fetchOrderProps),
+		queryKey: ["orders", fetchOrderParams ?? {}],
+		queryFn: () => ordersApi.fetchOrders(fetchOrderParams),
 		staleTime: Number.POSITIVE_INFINITY,
 		placeholderData: keepPreviousData,
 	});
