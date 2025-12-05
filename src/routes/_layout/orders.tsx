@@ -21,7 +21,9 @@ import { Button } from "@/components/ui/button";
 import {
 	Select,
 	SelectContent,
+	SelectGroup,
 	SelectItem,
+	SelectLabel,
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
@@ -112,7 +114,6 @@ function RouteComponent() {
 	const { data: orders } = useSuspenseQuery(
 		fetchOrdersQueryOptions(queryParams),
 	);
-	console.log(orders.items);
 
 	const columns: ColumnDef<Order>[] = [
 		{
@@ -455,12 +456,15 @@ function RouteComponent() {
 						<SelectValue placeholder="Order-Status" />
 					</SelectTrigger>
 					<SelectContent>
-						<SelectItem value="all">All</SelectItem>
-						{Object.values(ORDER_STATUS).map((s) => (
-							<SelectItem className="capitalize" key={s} value={s}>
-								{s}
-							</SelectItem>
-						))}
+						<SelectGroup>
+							<SelectLabel>Order Status</SelectLabel>
+							<SelectItem value="all">All</SelectItem>
+							{Object.values(ORDER_STATUS).map((s) => (
+								<SelectItem className="capitalize" key={s} value={s}>
+									{s}
+								</SelectItem>
+							))}
+						</SelectGroup>
 					</SelectContent>
 				</Select>
 				<Select
@@ -471,12 +475,15 @@ function RouteComponent() {
 						<SelectValue placeholder="Payment-Status" />
 					</SelectTrigger>
 					<SelectContent>
-						<SelectItem value="all">All</SelectItem>
-						{Object.values(PAYMENT_STATUS).map((p) => (
-							<SelectItem className="capitalize" key={p} value={p}>
-								{p}
-							</SelectItem>
-						))}
+						<SelectGroup>
+							<SelectLabel>Payment Status</SelectLabel>
+							<SelectItem value="all">All</SelectItem>
+							{Object.values(PAYMENT_STATUS).map((p) => (
+								<SelectItem className="capitalize" key={p} value={p}>
+									{p}
+								</SelectItem>
+							))}
+						</SelectGroup>
 					</SelectContent>
 				</Select>
 				<Select
@@ -487,17 +494,24 @@ function RouteComponent() {
 						<SelectValue placeholder="Payment-Method" />
 					</SelectTrigger>
 					<SelectContent>
-						<SelectItem value="all">All</SelectItem>
-						{Object.values(PAYMENT_METHOD).map((p) => (
-							<SelectItem className="capitalize" key={p} value={p}>
-								{p}
-							</SelectItem>
-						))}
+						<SelectGroup>
+							<SelectLabel>Payment Method</SelectLabel>
+							<SelectItem value="all">All</SelectItem>
+							{Object.values(PAYMENT_METHOD).map((p) => (
+								<SelectItem className="capitalize" key={p} value={p}>
+									{p}
+								</SelectItem>
+							))}
+						</SelectGroup>
 					</SelectContent>
 				</Select>
 
 				{hasActiveFilters && (
-					<Button onClick={clearFilters} variant="ghost" className="gap-2">
+					<Button
+						onClick={clearFilters}
+						variant="ghost"
+						className="gap-2 text-destructive hover:text-destructive cursor-pointer"
+					>
 						<X className="size-4" />
 						Clear Filters
 					</Button>

@@ -6,7 +6,6 @@ import {
 	Package,
 	Pizza,
 	Sparkles,
-	Users,
 	UtensilsCrossed,
 } from "lucide-react";
 import { useLogout } from "@/api/authApi";
@@ -26,7 +25,6 @@ import type { MenuItem } from "@/types/nav";
 export const menu: MenuItem[] = [
 	{ title: "Dashboard", url: "/", icon: LayoutDashboard },
 	{ title: "Orders", url: "/orders", icon: Package },
-	{ title: "Users", url: "/users", icon: Users },
 	{
 		title: "Menu",
 		url: "/menu",

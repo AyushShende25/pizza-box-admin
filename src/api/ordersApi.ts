@@ -28,8 +28,6 @@ export const ordersApi = {
 		orderStatus: OrderStatus;
 	}) => {
 		const res = await api.patch(`/orders/${orderId}/status`, { orderStatus });
-		console.log(res.data, "update-status");
-
 		return res.data;
 	},
 };
@@ -47,7 +45,6 @@ export function useUpdateOrderStatus() {
 	return useMutation({
 		mutationFn: ordersApi.updateOrderStatus,
 		onSuccess: () => {
-			toast.success("updated order-status");
 			queryClient.invalidateQueries({
 				queryKey: ["orders"],
 			});

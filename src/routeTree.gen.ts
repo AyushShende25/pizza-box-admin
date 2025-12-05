@@ -12,7 +12,6 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LayoutRouteImport } from './routes/_layout'
 import { Route as LayoutIndexRouteImport } from './routes/_layout/index'
-import { Route as LayoutUsersRouteImport } from './routes/_layout/users'
 import { Route as LayoutOrdersRouteImport } from './routes/_layout/orders'
 import { Route as LayoutMenuIndexRouteImport } from './routes/_layout/menu/index'
 import { Route as LayoutMenuToppingsRouteImport } from './routes/_layout/menu/toppings'
@@ -32,11 +31,6 @@ const LayoutRoute = LayoutRouteImport.update({
 const LayoutIndexRoute = LayoutIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => LayoutRoute,
-} as any)
-const LayoutUsersRoute = LayoutUsersRouteImport.update({
-  id: '/users',
-  path: '/users',
   getParentRoute: () => LayoutRoute,
 } as any)
 const LayoutOrdersRoute = LayoutOrdersRouteImport.update({
@@ -73,7 +67,6 @@ const LayoutMenuCrustRoute = LayoutMenuCrustRouteImport.update({
 export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/orders': typeof LayoutOrdersRoute
-  '/users': typeof LayoutUsersRoute
   '/': typeof LayoutIndexRoute
   '/menu/crust': typeof LayoutMenuCrustRoute
   '/menu/pizza': typeof LayoutMenuPizzaRoute
@@ -84,7 +77,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/orders': typeof LayoutOrdersRoute
-  '/users': typeof LayoutUsersRoute
   '/': typeof LayoutIndexRoute
   '/menu/crust': typeof LayoutMenuCrustRoute
   '/menu/pizza': typeof LayoutMenuPizzaRoute
@@ -97,7 +89,6 @@ export interface FileRoutesById {
   '/_layout': typeof LayoutRouteWithChildren
   '/login': typeof LoginRoute
   '/_layout/orders': typeof LayoutOrdersRoute
-  '/_layout/users': typeof LayoutUsersRoute
   '/_layout/': typeof LayoutIndexRoute
   '/_layout/menu/crust': typeof LayoutMenuCrustRoute
   '/_layout/menu/pizza': typeof LayoutMenuPizzaRoute
@@ -110,7 +101,6 @@ export interface FileRouteTypes {
   fullPaths:
     | '/login'
     | '/orders'
-    | '/users'
     | '/'
     | '/menu/crust'
     | '/menu/pizza'
@@ -121,7 +111,6 @@ export interface FileRouteTypes {
   to:
     | '/login'
     | '/orders'
-    | '/users'
     | '/'
     | '/menu/crust'
     | '/menu/pizza'
@@ -133,7 +122,6 @@ export interface FileRouteTypes {
     | '/_layout'
     | '/login'
     | '/_layout/orders'
-    | '/_layout/users'
     | '/_layout/'
     | '/_layout/menu/crust'
     | '/_layout/menu/pizza'
@@ -168,13 +156,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof LayoutIndexRouteImport
-      parentRoute: typeof LayoutRoute
-    }
-    '/_layout/users': {
-      id: '/_layout/users'
-      path: '/users'
-      fullPath: '/users'
-      preLoaderRoute: typeof LayoutUsersRouteImport
       parentRoute: typeof LayoutRoute
     }
     '/_layout/orders': {
@@ -224,7 +205,6 @@ declare module '@tanstack/react-router' {
 
 interface LayoutRouteChildren {
   LayoutOrdersRoute: typeof LayoutOrdersRoute
-  LayoutUsersRoute: typeof LayoutUsersRoute
   LayoutIndexRoute: typeof LayoutIndexRoute
   LayoutMenuCrustRoute: typeof LayoutMenuCrustRoute
   LayoutMenuPizzaRoute: typeof LayoutMenuPizzaRoute
@@ -235,7 +215,6 @@ interface LayoutRouteChildren {
 
 const LayoutRouteChildren: LayoutRouteChildren = {
   LayoutOrdersRoute: LayoutOrdersRoute,
-  LayoutUsersRoute: LayoutUsersRoute,
   LayoutIndexRoute: LayoutIndexRoute,
   LayoutMenuCrustRoute: LayoutMenuCrustRoute,
   LayoutMenuPizzaRoute: LayoutMenuPizzaRoute,
