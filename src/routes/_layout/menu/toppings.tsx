@@ -152,9 +152,10 @@ function RouteComponent() {
 				return (
 					<Switch
 						onCheckedChange={(val) => {
-							toggleToppingAvailabilityMutation.mutateAsync({
+							toggleToppingAvailabilityMutation.mutate({
 								toppingId: row.original.id,
 								isAvailable: val,
+								queryParams,
 							});
 						}}
 						checked={row.original.isAvailable}
@@ -172,7 +173,12 @@ function RouteComponent() {
 				return (
 					<div className="flex gap-4">
 						<Trash2
-							onClick={() => deleteToppingMutation.mutateAsync(row.original.id)}
+							onClick={() =>
+								deleteToppingMutation.mutateAsync({
+									toppingId: row.original.id,
+									queryParams,
+								})
+							}
 							className="cursor-pointer text-destructive w-4 h-4"
 						/>
 

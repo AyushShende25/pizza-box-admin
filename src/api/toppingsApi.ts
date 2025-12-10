@@ -84,26 +84,34 @@ export function useCreateTopping() {
 export function useDeleteTopping() {
 	const queryClient = useQueryClient();
 	return useMutation({
-		mutationFn: (toppingId: string) => toppingsApi.deleteTopping(toppingId),
-		onMutate: async (toppingId) => {
-			await queryClient.cancelQueries({ queryKey: ["toppings"] });
+		mutationFn: ({
+			toppingId,
+		}: {
+			toppingId: string;
+			queryParams?: FetchToppingsParams;
+		}) => toppingsApi.deleteTopping(toppingId),
+		onMutate: async ({ toppingId, queryParams }) => {
+			const queryKey = ["toppings", queryParams ?? {}];
+			await queryClient.cancelQueries({ queryKey });
 
 			const previousToppings = queryClient.getQueryData<Topping[]>([
 				"toppings",
 			]);
 
-			queryClient.setQueryData<Topping[]>(["toppings"], (old) =>
+			queryClient.setQueryData<Topping[]>(queryKey, (old) =>
 				old?.filter((i) => i.id !== toppingId),
 			);
 
-			return { previousToppings };
+			return { previousToppings, queryKey };
 		},
 		onError: (_err, _variables, context) => {
-			queryClient.setQueryData(["toppings"], context?.previousToppings);
+			if (context?.previousToppings && context?.queryKey) {
+				queryClient.setQueryData(context.queryKey, context.previousToppings);
+			}
 		},
-		onSettled: () => {
+		onSettled: (_data, _err, { queryParams }) => {
 			queryClient.invalidateQueries({
-				queryKey: ["toppings"],
+				queryKey: ["toppings", queryParams ?? {}],
 			});
 		},
 	});
@@ -118,26 +126,33 @@ export function useToggleToppingAvailability() {
 		}: {
 			toppingId: string;
 			isAvailable: boolean;
+			queryParams?: FetchToppingsParams;
 		}) => toppingsApi.toggleAvailability(toppingId, isAvailable),
-		onMutate: async ({ toppingId, isAvailable }) => {
-			await queryClient.cancelQueries({ queryKey: ["toppings"] });
+		onMutate: async ({ toppingId, isAvailable, queryParams }) => {
+			const queryKey = ["toppings", queryParams ?? {}];
+			await queryClient.cancelQueries({ queryKey });
 
-			const previousToppings = queryClient.getQueryData<Topping[]>([
-				"toppings",
-			]);
+			const previousToppings = queryClient.getQueryData<Topping[]>(queryKey);
 
-			queryClient.setQueryData<Topping[]>(["toppings"], (old) =>
-				old?.map((i) => (i.id === toppingId ? { ...i, isAvailable } : i)),
-			);
+			if (previousToppings) {
+				queryClient.setQueryData<Topping[]>(
+					queryKey,
+					previousToppings.map((i) =>
+						i.id === toppingId ? { ...i, isAvailable } : i,
+					),
+				);
+			}
 
-			return { previousToppings };
+			return { previousToppings, queryKey };
 		},
 		onError: (_err, _variables, context) => {
-			queryClient.setQueryData(["toppings"], context?.previousToppings);
+			if (context?.previousToppings && context?.queryKey) {
+				queryClient.setQueryData(context.queryKey, context.previousToppings);
+			}
 		},
-		onSettled: () => {
+		onSettled: (_data, _err, { queryParams }) => {
 			queryClient.invalidateQueries({
-				queryKey: ["toppings"],
+				queryKey: ["toppings", queryParams ?? {}],
 			});
 		},
 	});

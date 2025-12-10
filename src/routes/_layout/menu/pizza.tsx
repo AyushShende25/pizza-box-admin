@@ -239,13 +239,10 @@ function RouteComponent() {
 				return (
 					<Switch
 						onCheckedChange={(val) => {
-							togglePizzaFeaturedMutation.mutateAsync({
+							togglePizzaFeaturedMutation.mutate({
 								pizzaId: row.original.id,
 								isFeatured: val,
-								queryParams: {
-									page: pagination.pageIndex + 1,
-									limit: pagination.pageSize,
-								},
+								queryParams,
 							});
 						}}
 						checked={isFeatured}
@@ -271,13 +268,10 @@ function RouteComponent() {
 				return (
 					<Switch
 						onCheckedChange={(val) => {
-							togglePizzaAvailabilityMutation.mutateAsync({
+							togglePizzaAvailabilityMutation.mutate({
 								pizzaId: row.original.id,
 								isAvailable: val,
-								queryParams: {
-									page: pagination.pageIndex + 1,
-									limit: pagination.pageSize,
-								},
+								queryParams,
 							});
 						}}
 						checked={isAvailable}
@@ -296,12 +290,9 @@ function RouteComponent() {
 						<Trash2
 							className="cursor-pointer text-destructive w-4 h-4"
 							onClick={() =>
-								deletePizzaMutation.mutateAsync({
+								deletePizzaMutation.mutate({
 									pizzaId: row.original.id,
-									queryParams: {
-										page: pagination.pageIndex + 1,
-										limit: pagination.pageSize,
-									},
+									queryParams,
 									onPageRedirect: () => {
 										// Only redirect if we're not on page 1 and this is the last item
 										if (pagination.pageIndex > 0 && data?.items?.length === 1) {

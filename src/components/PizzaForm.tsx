@@ -48,7 +48,7 @@ function PizzaForm({ mode, pizza, pizzaId }: PizzaFormProps) {
 	const defaultValues: PizzaFormType = {
 		name: pizza?.name ?? "",
 		description: pizza?.description ?? "",
-		basePrice: pizza?.basePrice ?? 0,
+		basePrice: Number(pizza?.basePrice) ?? 0,
 		category: pizza?.category ?? PIZZA_CATEGORY.VEG,
 		pizzaImage: undefined,
 		defaultToppings: pizza?.defaultToppings ?? [],

@@ -98,6 +98,8 @@ function WsProvider({ children }: { children: React.ReactNode }) {
 			case "ORDER_CANCELLED":
 				toast.success(message.message);
 				queryClient.invalidateQueries({ queryKey: ["orders"] });
+				queryClient.invalidateQueries({ queryKey: ["stats"] });
+				queryClient.invalidateQueries({ queryKey: ["monthly-sales"] });
 				break;
 			case "PAYMENT_SUCCESSFUL":
 			case "PAYMENT_FAILED":

@@ -122,9 +122,9 @@ export function useDeletePizza() {
 				queryClient.setQueryData(context.queryKey, context.previousData);
 			}
 		},
-		onSettled: () => {
+		onSettled: (_data, _error, { queryParams }) => {
 			queryClient.invalidateQueries({
-				queryKey: ["pizzas"],
+				queryKey: ["pizzas", queryParams ?? {}],
 			});
 		},
 	});
@@ -189,6 +189,7 @@ export function useTogglePizzaFeatured() {
 
 			const previousData =
 				queryClient.getQueryData<PizzaListResponse>(queryKey);
+			console.log(previousData, "p");
 
 			if (previousData) {
 				queryClient.setQueryData<PizzaListResponse>(queryKey, {
