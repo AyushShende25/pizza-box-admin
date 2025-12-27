@@ -19,7 +19,9 @@ function WsProvider({ children }: { children: React.ReactNode }) {
 
 	const wsRef = useRef<WebSocket | null>(null);
 	const [isConnected, setIsConnected] = useState(false);
-	const reconnectTimeoutRef = useRef<number | null>(null);
+	const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+		null,
+	);
 	const userRef = useRef<typeof user>(null);
 
 	useEffect(() => {
