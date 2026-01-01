@@ -107,8 +107,6 @@ function Dashboard() {
 			})),
 		[statsSummary],
 	);
-	console.log(monthlySales);
-	console.log(statsSummary);
 
 	return (
 		<div>

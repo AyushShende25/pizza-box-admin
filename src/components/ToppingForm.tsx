@@ -59,17 +59,17 @@ function ToppingForm({ mode, topping, toppingId }: ToppingFormProps) {
 			onSubmitAsync: async ({ value, formApi }) => {
 				try {
 					if (mode === "create") {
-						const imgUrl = await handleUpload("topping", value.toppingImage);
-						await createToppingMutation.mutateAsync({ data: value, imgUrl });
+						const imageUrl = await handleUpload("topping", value.toppingImage);
+						await createToppingMutation.mutateAsync({ data: value, imageUrl });
 					} else {
 						if (!toppingId) throw new Error("topping-id is required for edit");
-						const imgUrl = value.toppingImage
+						const imageUrl = value.toppingImage
 							? await handleUpload("topping", value.toppingImage)
 							: topping?.imageUrl;
 						await updateToppingMutation.mutateAsync({
 							data: value,
 							toppingId,
-							imgUrl,
+							imageUrl,
 						});
 					}
 					return undefined;

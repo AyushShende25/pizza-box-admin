@@ -68,17 +68,17 @@ function PizzaForm({ mode, pizza, pizzaId }: PizzaFormProps) {
 			onSubmitAsync: async ({ value, formApi }) => {
 				try {
 					if (mode === "create") {
-						const imgUrl = await handleUpload("pizza", value.pizzaImage);
-						await createPizzaMutation.mutateAsync({ data: value, imgUrl });
+						const imageUrl = await handleUpload("pizza", value.pizzaImage);
+						await createPizzaMutation.mutateAsync({ data: value, imageUrl });
 					} else {
 						if (!pizzaId) throw new Error("pizza-id is required for edit");
-						const imgUrl = value.pizzaImage
+						const imageUrl = value.pizzaImage
 							? await handleUpload("pizza", value.pizzaImage)
 							: pizza?.imageUrl;
 						await updatePizzaMutation.mutateAsync({
 							data: value,
 							pizzaId,
-							imgUrl,
+							imageUrl,
 						});
 					}
 					return undefined;

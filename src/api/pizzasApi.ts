@@ -20,26 +20,26 @@ export const pizzasApi = {
 	},
 	createPizza: async (
 		pizzaFormData: PizzaFormType,
-		imgUrl?: string,
+		imageUrl?: string,
 	): Promise<Pizza> => {
 		const { pizzaImage: _, defaultToppings, ...rest } = pizzaFormData;
 		const res = await api.post("/menu/pizzas", {
 			...rest,
 			default_topping_ids: defaultToppings?.map((t) => t.id),
-			imgUrl,
+			imageUrl,
 		});
 		return res.data;
 	},
 	updatePizza: async (
 		pizzaId: string,
 		pizzaUpdateData: PizzaFormType,
-		imgUrl?: string,
+		imageUrl?: string,
 	) => {
 		const { pizzaImage: _, defaultToppings, ...rest } = pizzaUpdateData;
 		const res = await api.patch(`/menu/pizzas/${pizzaId}`, {
 			...rest,
 			default_topping_ids: defaultToppings?.map((t) => t.id),
-			imgUrl,
+			imageUrl,
 		});
 		return res.data;
 	},
@@ -71,8 +71,13 @@ export const fetchPizzasQueryOptions = (fetchPizzaParams?: FetchPizzaParams) =>
 export function useCreatePizza() {
 	const queryClient = useQueryClient();
 	return useMutation({
-		mutationFn: ({ data, imgUrl }: { data: PizzaFormType; imgUrl: string }) =>
-			pizzasApi.createPizza(data, imgUrl),
+		mutationFn: ({
+			data,
+			imageUrl,
+		}: {
+			data: PizzaFormType;
+			imageUrl: string;
+		}) => pizzasApi.createPizza(data, imageUrl),
 		onSuccess: () => {
 			queryClient.invalidateQueries({
 				queryKey: ["pizzas"],
@@ -189,7 +194,6 @@ export function useTogglePizzaFeatured() {
 
 			const previousData =
 				queryClient.getQueryData<PizzaListResponse>(queryKey);
-			console.log(previousData, "p");
 
 			if (previousData) {
 				queryClient.setQueryData<PizzaListResponse>(queryKey, {
@@ -221,12 +225,12 @@ export function useUpdatePizza() {
 		mutationFn: ({
 			data,
 			pizzaId,
-			imgUrl,
+			imageUrl,
 		}: {
 			data: PizzaFormType;
 			pizzaId: string;
-			imgUrl: string;
-		}) => pizzasApi.updatePizza(pizzaId, data, imgUrl),
+			imageUrl: string;
+		}) => pizzasApi.updatePizza(pizzaId, data, imageUrl),
 		onSuccess: () => {
 			queryClient.invalidateQueries({
 				queryKey: ["pizzas"],

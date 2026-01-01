@@ -20,28 +20,28 @@ export const toppingsApi = {
 	},
 	createTopping: async (
 		toppingFormInput: ToppingFormType,
-		imgUrl?: string,
+		imageUrl?: string,
 	): Promise<Topping> => {
 		const { type, toppingImage: _, ...rest } = toppingFormInput;
 		const isVegetarian = type === "veg";
 		const res = await api.post("/menu/toppings", {
 			...rest,
 			isVegetarian,
-			imgUrl,
+			imageUrl,
 		});
 		return res.data;
 	},
 	updateTopping: async (
 		toppingId: string,
 		toppingUpdateData: ToppingFormType,
-		imgUrl?: string,
+		imageUrl?: string,
 	) => {
 		const { type, toppingImage: _, ...rest } = toppingUpdateData;
 		const isVegetarian = type === "veg";
 		const res = await api.patch(`/menu/toppings/${toppingId}`, {
 			...rest,
 			isVegetarian,
-			imgUrl,
+			imageUrl,
 		});
 		return res.data;
 	},
@@ -70,8 +70,13 @@ export function useCreateTopping() {
 	const queryClient = useQueryClient();
 
 	return useMutation({
-		mutationFn: ({ data, imgUrl }: { data: ToppingFormType; imgUrl: string }) =>
-			toppingsApi.createTopping(data, imgUrl),
+		mutationFn: ({
+			data,
+			imageUrl,
+		}: {
+			data: ToppingFormType;
+			imageUrl: string;
+		}) => toppingsApi.createTopping(data, imageUrl),
 		onSuccess: () => {
 			queryClient.invalidateQueries({
 				queryKey: ["toppings"],
@@ -164,12 +169,12 @@ export function useUpdateTopping() {
 		mutationFn: ({
 			data,
 			toppingId,
-			imgUrl,
+			imageUrl,
 		}: {
 			data: ToppingFormType;
 			toppingId: string;
-			imgUrl: string;
-		}) => toppingsApi.updateTopping(toppingId, data, imgUrl),
+			imageUrl: string;
+		}) => toppingsApi.updateTopping(toppingId, data, imageUrl),
 		onSuccess: () => {
 			queryClient.invalidateQueries({
 				queryKey: ["toppings"],
