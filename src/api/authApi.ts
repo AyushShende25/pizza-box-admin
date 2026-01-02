@@ -4,8 +4,11 @@ import {
 	useQueryClient,
 } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
+import { toast } from "sonner";
 import { api } from "@/api/axios";
 import type { LoginFormType } from "@/components/LoginForm";
+import type { ForgotPasswordFormType } from "@/routes/forgot-password";
+import type { ResetPasswordFormType } from "@/routes/reset-password";
 import type { User } from "@/types/user";
 
 export const authApi = {
@@ -28,6 +31,19 @@ export const authApi = {
 	},
 	logout: async () => {
 		const res = await api.post("/auth/logout");
+		return res.data;
+	},
+	forgotPassword: async (forgotPasswordData: ForgotPasswordFormType) => {
+		const res = await api.post("/auth/forgot-password", forgotPasswordData);
+		return res.data;
+	},
+	resetPassword: async (
+		token: string,
+		resetFormData: ResetPasswordFormType,
+	) => {
+		const res = await api.post(`/auth/reset-password?token=${token}`, {
+			password: resetFormData.password,
+		});
 		return res.data;
 	},
 };
@@ -86,6 +102,36 @@ export function useLogout() {
 		onSettled: () => {
 			queryClient.clear();
 			navigate({ to: "/login" });
+		},
+	});
+}
+
+export function useForgotPassword() {
+	const navigate = useNavigate();
+	return useMutation({
+		mutationFn: (data: ForgotPasswordFormType) => authApi.forgotPassword(data),
+		onSuccess: () => {
+			toast.success(
+				"You will receive the reset instructions, if your account exists",
+			);
+			navigate({ to: "/login", replace: true });
+		},
+	});
+}
+
+export function useResetPassword() {
+	const navigate = useNavigate();
+	return useMutation({
+		mutationFn: ({
+			token,
+			data,
+		}: {
+			token: string;
+			data: ResetPasswordFormType;
+		}) => authApi.resetPassword(token, data),
+		onSuccess: () => {
+			toast.success("password reset successfully");
+			navigate({ to: "/login", replace: true });
 		},
 	});
 }

@@ -1,8 +1,9 @@
 import { useForm } from "@tanstack/react-form";
-import { Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import * as z from "zod";
-import { useLogin } from "@/api/authApi";
+import { useForgotPassword } from "@/api/authApi";
 import FieldInfo from "@/components/FieldInfo";
+import Logo from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -13,28 +14,26 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { cn } from "@/lib/utils";
 
-const loginFormSchema = z.object({
-	email: z.email("enter a valid email address"),
-	password: z.string().min(1, "password cannot be empty"),
+export const Route = createFileRoute("/forgot-password")({
+	component: RouteComponent,
 });
-export type LoginFormType = z.infer<typeof loginFormSchema>;
 
-export default function LoginForm({
-	className,
-	...props
-}: React.ComponentProps<"div">) {
-	const loginMutation = useLogin();
+const forgotPasswordFormSchema = z.object({
+	email: z.email(),
+});
+export type ForgotPasswordFormType = z.infer<typeof forgotPasswordFormSchema>;
+
+function RouteComponent() {
+	const forgotPassword = useForgotPassword();
 
 	const form = useForm({
-		defaultValues: { email: "", password: "" },
+		defaultValues: { email: "" },
 		validators: {
-			onChange: loginFormSchema,
+			onChange: forgotPasswordFormSchema,
 			onSubmitAsync: async ({ value }) => {
 				try {
-					await loginMutation.mutateAsync(value);
-					return undefined;
+					await forgotPassword.mutateAsync(value);
 					// biome-ignore lint/suspicious/noExplicitAny: <error typing>
 				} catch (error: any) {
 					const errorMessage =
@@ -46,12 +45,19 @@ export default function LoginForm({
 			},
 		},
 	});
+
 	return (
-		<div className={cn("flex flex-col gap-6", className)} {...props}>
-			<Card>
+		<div className="flex justify-center items-center min-h-svh ">
+			<Card className="min-w-md">
 				<CardHeader className="text-center">
-					<CardTitle className="text-xl">Welcome back</CardTitle>
-					<CardDescription>Login and manage your Restaurant!</CardDescription>
+					<div className="mb-6 mx-auto">
+						<Logo />
+					</div>
+					<CardTitle className="text-xl">Forgot your password?</CardTitle>
+					<CardDescription>
+						Worry not! enter your registered email and we will send you a reset
+						link
+					</CardDescription>
 				</CardHeader>
 				<CardContent>
 					<form
@@ -71,31 +77,6 @@ export default function LoginForm({
 												id="email"
 												type="email"
 												placeholder="m@example.com"
-												name={field.name}
-												value={field.state.value}
-												onBlur={field.handleBlur}
-												onChange={(e) => field.handleChange(e.target.value)}
-											/>
-											<FieldInfo field={field} />
-										</div>
-									)}
-								/>
-								<form.Field
-									name="password"
-									children={(field) => (
-										<div className="grid gap-3">
-											<div className="flex justify-between">
-												<Label htmlFor="password">Password</Label>
-												<Link
-													to="/forgot-password"
-													className="underline underline-offset-4 text-xs"
-												>
-													forgot password?
-												</Link>
-											</div>
-											<Input
-												id="password"
-												type="password"
 												name={field.name}
 												value={field.state.value}
 												onBlur={field.handleBlur}
@@ -125,10 +106,9 @@ export default function LoginForm({
 											<Button
 												className="w-full"
 												type="submit"
-												aria-disabled={!canSubmit}
 												disabled={!canSubmit}
 											>
-												{isSubmitting ? "..." : "Login"}
+												{isSubmitting ? "..." : "Submit"}
 											</Button>
 										)}
 									/>
@@ -138,10 +118,6 @@ export default function LoginForm({
 					</form>
 				</CardContent>
 			</Card>
-			<div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">
-				By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
-				and <a href="#">Privacy Policy</a>.
-			</div>
 		</div>
 	);
 }

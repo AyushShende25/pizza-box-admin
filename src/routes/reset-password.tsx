@@ -1,40 +1,52 @@
 import { useForm } from "@tanstack/react-form";
-import { Link } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { TriangleAlert } from "lucide-react";
 import * as z from "zod";
-import { useLogin } from "@/api/authApi";
+import { useResetPassword } from "@/api/authApi";
 import FieldInfo from "@/components/FieldInfo";
+import Logo from "@/components/Logo";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { cn } from "@/lib/utils";
 
-const loginFormSchema = z.object({
-	email: z.email("enter a valid email address"),
-	password: z.string().min(1, "password cannot be empty"),
+const searchSchema = z.object({
+	token: z.string().optional(),
 });
-export type LoginFormType = z.infer<typeof loginFormSchema>;
 
-export default function LoginForm({
-	className,
-	...props
-}: React.ComponentProps<"div">) {
-	const loginMutation = useLogin();
+export const Route = createFileRoute("/reset-password")({
+	component: RouteComponent,
+	validateSearch: searchSchema,
+});
+
+const resetPasswordFormSchema = z
+	.object({
+		password: z
+			.string()
+			.min(8, "Password must be at least 8 characters long")
+			.max(255),
+		confirm: z.string(),
+	})
+	.refine((data) => data.password === data.confirm, {
+		message: "Passwords don't match",
+		path: ["confirm"], // path of error
+	});
+export type ResetPasswordFormType = z.infer<typeof resetPasswordFormSchema>;
+
+function RouteComponent() {
+	const { token } = Route.useSearch();
+
+	const resetPassword = useResetPassword();
 
 	const form = useForm({
-		defaultValues: { email: "", password: "" },
+		defaultValues: { password: "", confirm: "" },
 		validators: {
-			onChange: loginFormSchema,
+			onChange: resetPasswordFormSchema,
 			onSubmitAsync: async ({ value }) => {
+				if (!token) return;
 				try {
-					await loginMutation.mutateAsync(value);
-					return undefined;
+					await resetPassword.mutateAsync({ token, data: value });
 					// biome-ignore lint/suspicious/noExplicitAny: <error typing>
 				} catch (error: any) {
 					const errorMessage =
@@ -46,12 +58,32 @@ export default function LoginForm({
 			},
 		},
 	});
+
+	if (!token) {
+		return (
+			<div className="flex items-center justify-center flex-col gap-4 h-screen p-6">
+				<Alert className="max-w-md" variant="destructive">
+					<TriangleAlert />
+					<AlertTitle>Invalid Link</AlertTitle>
+					<AlertDescription>Missing or invalid reset token.</AlertDescription>
+				</Alert>
+				<Link to="/login">
+					<Button variant={"link"} className="cursor-pointer">
+						Back to Login
+					</Button>
+				</Link>
+			</div>
+		);
+	}
+
 	return (
-		<div className={cn("flex flex-col gap-6", className)} {...props}>
-			<Card>
+		<div className="flex justify-center items-center min-h-svh ">
+			<Card className="min-w-md">
 				<CardHeader className="text-center">
-					<CardTitle className="text-xl">Welcome back</CardTitle>
-					<CardDescription>Login and manage your Restaurant!</CardDescription>
+					<div className="mb-6 mx-auto">
+						<Logo />
+					</div>
+					<CardTitle className="text-xl">Reset your password</CardTitle>
 				</CardHeader>
 				<CardContent>
 					<form
@@ -63,36 +95,10 @@ export default function LoginForm({
 						<div className="grid gap-6">
 							<div className="grid gap-6">
 								<form.Field
-									name="email"
-									children={(field) => (
-										<div className="grid gap-3">
-											<Label htmlFor="email">Email</Label>
-											<Input
-												id="email"
-												type="email"
-												placeholder="m@example.com"
-												name={field.name}
-												value={field.state.value}
-												onBlur={field.handleBlur}
-												onChange={(e) => field.handleChange(e.target.value)}
-											/>
-											<FieldInfo field={field} />
-										</div>
-									)}
-								/>
-								<form.Field
 									name="password"
 									children={(field) => (
 										<div className="grid gap-3">
-											<div className="flex justify-between">
-												<Label htmlFor="password">Password</Label>
-												<Link
-													to="/forgot-password"
-													className="underline underline-offset-4 text-xs"
-												>
-													forgot password?
-												</Link>
-											</div>
+											<Label htmlFor="password">New Password</Label>
 											<Input
 												id="password"
 												type="password"
@@ -106,6 +112,23 @@ export default function LoginForm({
 									)}
 								/>
 
+								<form.Field
+									name="confirm"
+									children={(field) => (
+										<div className="grid gap-3">
+											<Label htmlFor="confirm">Confirm New Password</Label>
+											<Input
+												id="confirm"
+												type="password"
+												name={field.name}
+												value={field.state.value}
+												onBlur={field.handleBlur}
+												onChange={(e) => field.handleChange(e.target.value)}
+											/>
+											<FieldInfo field={field} />
+										</div>
+									)}
+								/>
 								<div className="text-center space-y-2">
 									<form.Subscribe
 										selector={(state) => [state.errorMap]}
@@ -125,10 +148,9 @@ export default function LoginForm({
 											<Button
 												className="w-full"
 												type="submit"
-												aria-disabled={!canSubmit}
 												disabled={!canSubmit}
 											>
-												{isSubmitting ? "..." : "Login"}
+												{isSubmitting ? "..." : "Submit"}
 											</Button>
 										)}
 									/>
@@ -138,10 +160,6 @@ export default function LoginForm({
 					</form>
 				</CardContent>
 			</Card>
-			<div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">
-				By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
-				and <a href="#">Privacy Policy</a>.
-			</div>
 		</div>
 	);
 }

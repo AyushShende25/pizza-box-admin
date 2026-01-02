@@ -9,7 +9,9 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as LayoutRouteImport } from './routes/_layout'
 import { Route as LayoutIndexRouteImport } from './routes/_layout/index'
 import { Route as LayoutOrdersRouteImport } from './routes/_layout/orders'
@@ -19,9 +21,19 @@ import { Route as LayoutMenuSizeRouteImport } from './routes/_layout/menu/size'
 import { Route as LayoutMenuPizzaRouteImport } from './routes/_layout/menu/pizza'
 import { Route as LayoutMenuCrustRouteImport } from './routes/_layout/menu/crust'
 
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LayoutRoute = LayoutRouteImport.update({
@@ -65,7 +77,9 @@ const LayoutMenuCrustRoute = LayoutMenuCrustRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
+  '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/orders': typeof LayoutOrdersRoute
   '/': typeof LayoutIndexRoute
   '/menu/crust': typeof LayoutMenuCrustRoute
@@ -75,7 +89,9 @@ export interface FileRoutesByFullPath {
   '/menu': typeof LayoutMenuIndexRoute
 }
 export interface FileRoutesByTo {
+  '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/orders': typeof LayoutOrdersRoute
   '/': typeof LayoutIndexRoute
   '/menu/crust': typeof LayoutMenuCrustRoute
@@ -87,7 +103,9 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_layout': typeof LayoutRouteWithChildren
+  '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/_layout/orders': typeof LayoutOrdersRoute
   '/_layout/': typeof LayoutIndexRoute
   '/_layout/menu/crust': typeof LayoutMenuCrustRoute
@@ -99,7 +117,9 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/forgot-password'
     | '/login'
+    | '/reset-password'
     | '/orders'
     | '/'
     | '/menu/crust'
@@ -109,7 +129,9 @@ export interface FileRouteTypes {
     | '/menu'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/forgot-password'
     | '/login'
+    | '/reset-password'
     | '/orders'
     | '/'
     | '/menu/crust'
@@ -120,7 +142,9 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/_layout'
+    | '/forgot-password'
     | '/login'
+    | '/reset-password'
     | '/_layout/orders'
     | '/_layout/'
     | '/_layout/menu/crust'
@@ -132,16 +156,32 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   LayoutRoute: typeof LayoutRouteWithChildren
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
   LoginRoute: typeof LoginRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_layout': {
@@ -228,7 +268,9 @@ const LayoutRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   LayoutRoute: LayoutRouteWithChildren,
+  ForgotPasswordRoute: ForgotPasswordRoute,
   LoginRoute: LoginRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
