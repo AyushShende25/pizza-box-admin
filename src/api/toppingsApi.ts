@@ -22,11 +22,10 @@ export const toppingsApi = {
 		toppingFormInput: ToppingFormType,
 		imageUrl?: string,
 	): Promise<Topping> => {
-		const { type, toppingImage: _, ...rest } = toppingFormInput;
-		const isVegetarian = type === "veg";
+		const { toppingImage: _, price, ...rest } = toppingFormInput;
 		const res = await api.post("/menu/toppings", {
 			...rest,
-			isVegetarian,
+			priceModifier: price,
 			imageUrl,
 		});
 		return res.data;
@@ -36,11 +35,10 @@ export const toppingsApi = {
 		toppingUpdateData: ToppingFormType,
 		imageUrl?: string,
 	) => {
-		const { type, toppingImage: _, ...rest } = toppingUpdateData;
-		const isVegetarian = type === "veg";
+		const { toppingImage: _, price, ...rest } = toppingUpdateData;
 		const res = await api.patch(`/menu/toppings/${toppingId}`, {
 			...rest,
-			isVegetarian,
+			priceModifier: price,
 			imageUrl,
 		});
 		return res.data;

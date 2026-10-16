@@ -32,7 +32,7 @@ function RouteComponent() {
 	const deleteCrustMutation = useDeleteCrust();
 	const columns: ColumnDef<Crust>[] = [
 		{
-			accessorKey: "sortOrder",
+			accessorKey: "sort_order",
 			header: "Order",
 			cell: ({ row }) => {
 				return (
@@ -62,10 +62,10 @@ function RouteComponent() {
 		},
 
 		{
-			accessorKey: "additional_price",
+			accessorKey: "price_modifier",
 			header: "Price",
 			cell: ({ row }) => {
-				const price = Number(row.original.additionalPrice);
+				const price = Number(row.original.priceModifier);
 				return (
 					<span className="font-medium whitespace-nowrap">
 						₹{price.toFixed(2)}

@@ -14,11 +14,19 @@ export const sizesApi = {
 		return res.data;
 	},
 	createSize: async (sizeFormData: SizeFormType): Promise<Size> => {
-		const res = await api.post("/menu/sizes", sizeFormData);
+		const { price, ...rest } = sizeFormData;
+		const res = await api.post("/menu/sizes", {
+			...rest,
+			priceModifier: price,
+		});
 		return res.data;
 	},
 	updateSize: async (sizeId: string, sizeUpdateData: SizeFormType) => {
-		const res = await api.patch(`/menu/sizes/${sizeId}`, sizeUpdateData);
+		const { price, ...rest } = sizeUpdateData;
+		const res = await api.patch(`/menu/sizes/${sizeId}`, {
+			...rest,
+			priceModifier: price,
+		});
 		return res.data;
 	},
 	deleteSize: async (sizeId: string) => {

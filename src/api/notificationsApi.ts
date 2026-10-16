@@ -5,14 +5,23 @@ import {
 } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
 import { toast } from "sonner";
-import type { Notification } from "@/types/notifications";
+import type {
+	Notification,
+	NotificationQueryParams,
+} from "@/types/notifications";
 import { api } from "./axios";
 
 export const notificationsApi = {
-	fetchNotifications: async (): Promise<Notification[]> => {
+	fetchNotifications: async ({
+		limit = 20,
+		status,
+		before,
+	}: NotificationQueryParams): Promise<Notification[]> => {
 		const res = await api.get("/notifications", {
 			params: {
-				limit: 10,
+				limit,
+				status,
+				before,
 			},
 		});
 		return res.data;
@@ -23,10 +32,12 @@ export const notificationsApi = {
 	},
 };
 
-export const fetchNotificationsQueryOptions = () =>
+export const fetchNotificationsQueryOptions = (
+	notificationQueryParams: NotificationQueryParams,
+) =>
 	queryOptions({
 		queryKey: ["notifications"],
-		queryFn: notificationsApi.fetchNotifications,
+		queryFn: () => notificationsApi.fetchNotifications(notificationQueryParams),
 		staleTime: Number.POSITIVE_INFINITY,
 	});
 

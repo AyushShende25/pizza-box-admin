@@ -97,7 +97,8 @@ function RouteComponent() {
 		const params: FetchOrdersParams = {
 			page: pagination.pageIndex + 1,
 			limit: pagination.pageSize,
-			sortBy: `${sorting[0].id}:${sorting[0].desc ? "desc" : "asc"}`,
+			sortBy: sorting[0].id,
+			order: sorting[0].desc ? "desc" : "asc",
 		};
 
 		if (filters.orderStatus !== "all")
@@ -309,13 +310,12 @@ function RouteComponent() {
 												<div className="text-sm space-y-1">
 													<p>
 														<span className="font-medium">Crust:</span>{" "}
-														{i.crustName} (₹{i.crustPrice})
+														{i.crustName} (₹{i.crustPriceModifier})
 													</p>
 
 													<p>
 														<span className="font-medium">Size:</span>{" "}
-														{i.sizeName} (₹
-														{Number(i.sizePrice) - Number(i.basePizzaPrice)})
+														{i.sizeName} (₹{i.sizePriceModifier})
 													</p>
 
 													<div>
@@ -360,16 +360,40 @@ function RouteComponent() {
 									<h3 className="font-semibold text-lg">Customer Info</h3>
 
 									<div className="text-sm space-y-1">
-										<p>
-											<span className="font-medium">Delivery Address:</span>{" "}
-											{order.deliveryAddress}
-										</p>
+										<div className="space-x-2">
+											<span className="font-medium">Name:</span>
+											<span>{order.deliveryName}</span>
+										</div>
+										<div className="space-x-2">
+											<span className="font-medium">Street:</span>
+											<span>{order.deliveryStreet}</span>
+										</div>
+										<div className="space-x-2">
+											<span className="font-medium">City:</span>
+											<span>{order.deliveryCity}</span>
+										</div>
+										<div className="space-x-2">
+											<span className="font-medium">State:</span>
+											<span>{order.deliveryState}</span>
+										</div>
+										<div className="space-x-2">
+											<span className="font-medium">Country:</span>
+											<span>{order.deliveryCountry}</span>
+										</div>
+										<div className="space-x-2">
+											<span className="font-medium">Postal Code:</span>
+											<span>{order.deliveryPostalCode}</span>
+										</div>
+										<div className="space-x-2">
+											<span className="font-medium">Contact:</span>
+											<span>{order.deliveryPhone}</span>
+										</div>
 
 										{order.notes && (
-											<p>
-												<span className="font-medium">Notes:</span>{" "}
-												{order.notes}
-											</p>
+											<div className="space-x-2">
+												<span className="font-medium">Notes:</span>
+												<span>{order.notes}</span>
+											</div>
 										)}
 									</div>
 								</section>

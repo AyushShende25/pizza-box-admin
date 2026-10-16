@@ -7,10 +7,10 @@ export const uploadApi = {
 			headers: { "Content-Type": file.type },
 		});
 	},
-	getPresignedUrl: async (entity_type: string, content_type: string) => {
+	getPresignedUrl: async (entityType: string, contentType: string) => {
 		const res = await api.post("/uploads/presigned-url", {
-			entity_type,
-			content_type,
+			entityType,
+			contentType,
 		});
 		return res.data;
 	},

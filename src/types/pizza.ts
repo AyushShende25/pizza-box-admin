@@ -7,20 +7,12 @@ export type Pizza = {
 	basePrice: number;
 	imageUrl: string;
 	isAvailable: boolean;
-	featured: boolean;
-	category: PizzaCategory;
+	foodType: FoodType;
+	isFeatured: boolean;
 	defaultToppings: Topping[];
 	createdAt: string;
 	updatedAt: string;
 };
-
-export const PIZZA_CATEGORY = {
-	VEG: "veg",
-	NONVEG: "non_veg",
-} as const;
-
-export type PizzaCategory =
-	(typeof PIZZA_CATEGORY)[keyof typeof PIZZA_CATEGORY];
 
 export type PizzaListResponse = {
 	items: Pizza[];
@@ -33,9 +25,26 @@ export type PizzaListResponse = {
 export type FetchPizzaParams = {
 	page?: number;
 	limit?: number;
-	sortBy?: string;
+	sortBy?: SortField;
+	order?: SortOrder;
 	name?: string;
-	category?: PizzaCategory;
+	foodType?: FoodType;
 	isAvailable?: boolean;
-	featured?: boolean;
+	isFeatured?: boolean;
 };
+export const FOOD_TYPE = {
+	VEG: "veg",
+	NONVEG: "non_veg",
+} as const;
+
+export type FoodType = (typeof FOOD_TYPE)[keyof typeof FOOD_TYPE];
+
+export type SortField =
+	| "created_at"
+	| "is_available"
+	| "is_featured"
+	| "name"
+	| "base_price"
+	| "food_type";
+
+export type SortOrder = "asc" | "desc";

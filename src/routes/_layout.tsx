@@ -1,4 +1,5 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { toast } from "sonner";
 import { fetchCurrentUserOptions } from "@/api/authApi";
 import AppSidebar from "@/components/app-sidebar";
 import Logo from "@/components/Logo";
@@ -11,8 +12,12 @@ export const Route = createFileRoute("/_layout")({
 		const user = await context.queryClient.ensureQueryData(
 			fetchCurrentUserOptions(),
 		);
+		if (!user) {
+			throw redirect({ to: "/login" });
+		}
 
-		if (!user || user.role !== "admin") {
+		if (user.role !== "admin") {
+			toast.error("Not Authorized");
 			throw redirect({ to: "/login" });
 		}
 	},

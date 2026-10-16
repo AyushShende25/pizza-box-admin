@@ -27,6 +27,7 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import type { FoodType } from "@/types/pizza";
 import {
 	type FetchToppingsParams,
 	TOPPING_CATEGORY,
@@ -44,7 +45,7 @@ export const Route = createFileRoute("/_layout/menu/toppings")({
 function RouteComponent() {
 	const [filters, setFilters] = useState({
 		category: "all",
-		type: "all",
+		foodType: "all",
 		availability: "all",
 	});
 
@@ -56,14 +57,14 @@ function RouteComponent() {
 		setFilters({
 			category: "all",
 			availability: "all",
-			type: "all",
+			foodType: "all",
 		});
 	};
 
 	const hasActiveFilters =
 		filters.category !== "all" ||
 		filters.availability !== "all" ||
-		filters.type !== "all";
+		filters.foodType !== "all";
 
 	const queryParams: FetchToppingsParams = useMemo(() => {
 		const params: FetchToppingsParams = {};
@@ -71,7 +72,8 @@ function RouteComponent() {
 		if (filters.category !== "all")
 			params.category = filters.category as ToppingCategory;
 
-		if (filters.type !== "all") params.vegetarianOnly = filters.type === "veg";
+		if (filters.foodType !== "all")
+			params.foodType = filters.foodType as FoodType;
 
 		if (filters.availability !== "all")
 			params.isAvailable = filters.availability === "available";
@@ -117,10 +119,10 @@ function RouteComponent() {
 			),
 		},
 		{
-			accessorKey: "price",
+			accessorKey: "price_modifier",
 			header: "Price",
 			cell: ({ row }) => {
-				const price = Number(row.original.price);
+				const price = Number(row.original.priceModifier);
 				return (
 					<span className="font-medium whitespace-nowrap">
 						₹{price.toFixed(2)}
@@ -133,11 +135,11 @@ function RouteComponent() {
 			header: "Category",
 		},
 		{
-			accessorKey: "is_vegetarian",
-			header: "Type",
+			accessorKey: "food_type",
+			header: "FoodType",
 			cell: ({ row }) => (
 				<span>
-					{row.original.isVegetarian === true ? (
+					{row.original.foodType === "veg" ? (
 						<Badge className="bg-green-600">Veg</Badge>
 					) : (
 						<Badge variant="destructive">Non-Veg</Badge>
@@ -234,14 +236,14 @@ function RouteComponent() {
 				</Select>
 
 				<Select
-					value={filters.type}
-					onValueChange={(v) => handleFilterChange("type", v)}
+					value={filters.foodType}
+					onValueChange={(v) => handleFilterChange("foodType", v)}
 				>
 					<SelectTrigger className="w-[180px]">
 						<SelectValue placeholder="Type" />
 					</SelectTrigger>
 					<SelectContent>
-						<SelectItem value="all">All Types</SelectItem>
+						<SelectItem value="all">All Food Types</SelectItem>
 						<SelectItem value="veg">Vegetarian</SelectItem>
 						<SelectItem value="non_veg">Non-Vegetarian</SelectItem>
 					</SelectContent>

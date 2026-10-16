@@ -17,7 +17,7 @@ type SizeFormProps = {
 const sizeFormSchema = z.object({
 	name: z.string().min(1, "name cannot be empty").max(50),
 	displayName: z.string().min(1, "display-name cannot be empty").max(100),
-	multiplier: z
+	price: z
 		.number("please enter a valid number")
 		.min(1, "multiplier must be positive"),
 	sortOrder: z
@@ -30,7 +30,7 @@ function SizeForm({ mode, size, sizeId, lastSortOrder }: SizeFormProps) {
 	const defaultValues: SizeFormType = {
 		name: size?.name ?? "",
 		displayName: size?.displayName ?? "",
-		multiplier: size?.multiplier ?? 0,
+		price: Number(size?.priceModifier) ?? 0,
 		sortOrder: size?.sortOrder ?? (lastSortOrder ?? 0) + 1,
 	};
 
@@ -106,10 +106,10 @@ function SizeForm({ mode, size, sizeId, lastSortOrder }: SizeFormProps) {
 					)}
 				/>
 				<form.Field
-					name="multiplier"
+					name="price"
 					children={(field) => (
 						<div className="grid gap-3">
-							<Label>Multiplier</Label>
+							<Label>Price</Label>
 							<Input
 								name={field.name}
 								value={field.state.value}

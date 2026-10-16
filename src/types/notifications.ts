@@ -10,14 +10,6 @@ export const NOTIFICATION_TYPE = {
 type NotificationType =
 	(typeof NOTIFICATION_TYPE)[keyof typeof NOTIFICATION_TYPE];
 
-export const NOTIFICATION_CHANNEL = {
-	WEBSOCKET: "websocket",
-	EMAIL: "email",
-} as const;
-
-type NotificationChannel =
-	(typeof NOTIFICATION_CHANNEL)[keyof typeof NOTIFICATION_CHANNEL];
-
 export const NOTIFICATION_PRIORITY = {
 	LOW: "low",
 	MEDIUM: "medium",
@@ -34,22 +26,28 @@ export type Notification = {
 	message: string;
 	notificationType: NotificationType;
 	priority: NotificationPriority;
-	data: any;
+	payload: any;
 	id: string;
-	channels: [NotificationChannel];
 	isRead: boolean;
 	readAt: string;
 	expiresAt?: string;
 	createdAt: string;
-	updatedAt: string;
 };
 
 export type WSNotification = {
-	scope: string;
-	type: string;
+	id: string;
+	type: NotificationType;
 	title: string;
 	message: string;
 	priority: NotificationPriority;
-	data: any;
+	payload: any;
 	created_at: string;
+};
+
+export type NotificationStatus = "read" | "unread";
+
+export type NotificationQueryParams = {
+	limit?: number;
+	status?: NotificationStatus;
+	before?: Date;
 };

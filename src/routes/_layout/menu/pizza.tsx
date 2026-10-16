@@ -36,16 +36,21 @@ import { Switch } from "@/components/ui/switch";
 import useDebounce from "@/hooks/useDebounce";
 import {
 	type FetchPizzaParams,
-	PIZZA_CATEGORY,
+	FOOD_TYPE,
+	type FoodType,
 	type Pizza,
-	type PizzaCategory,
 } from "@/types/pizza";
 
 export const Route = createFileRoute("/_layout/menu/pizza")({
 	component: RouteComponent,
 	loader: async ({ context }) => {
 		await context.queryClient.ensureQueryData(
-			fetchPizzasQueryOptions({ page: 1, limit: 4, sortBy: "created_at:desc" }),
+			fetchPizzasQueryOptions({
+				page: 1,
+				limit: 10,
+				sortBy: "created_at",
+				order: "desc",
+			}),
 		);
 	},
 });
@@ -53,7 +58,7 @@ export const Route = createFileRoute("/_layout/menu/pizza")({
 function RouteComponent() {
 	const [pagination, setPagination] = useState<PaginationState>({
 		pageIndex: 0,
-		pageSize: 4,
+		pageSize: 10,
 	});
 
 	const [sorting, setSorting] = useState<SortingState>([
@@ -62,7 +67,7 @@ function RouteComponent() {
 
 	const [filters, setFilters] = useState({
 		name: "",
-		category: "all",
+		foodType: "all",
 		availability: "all",
 		featured: "all",
 	});
@@ -82,7 +87,7 @@ function RouteComponent() {
 	const clearFilters = () => {
 		setFilters({
 			name: "",
-			category: "all",
+			foodType: "all",
 			availability: "all",
 			featured: "all",
 		});
@@ -92,7 +97,7 @@ function RouteComponent() {
 
 	const hasActiveFilters =
 		filters.name.trim() ||
-		filters.category !== "all" ||
+		filters.foodType !== "all" ||
 		filters.availability !== "all" ||
 		filters.featured !== "all";
 
@@ -100,18 +105,19 @@ function RouteComponent() {
 		const params: FetchPizzaParams = {
 			page: pagination.pageIndex + 1,
 			limit: pagination.pageSize,
-			sortBy: `${sorting[0].id}:${sorting[0].desc ? "desc" : "asc"}`,
+			sortBy: sorting[0].id,
+			order: sorting[0].desc ? "desc" : "asc",
 		};
 
 		if (filters.name.trim()) params.name = filters.name.trim();
-		if (filters.category !== "all")
-			params.category = filters.category as PizzaCategory;
+		if (filters.foodType !== "all")
+			params.foodType = filters.foodType as FoodType;
 
 		if (filters.availability !== "all")
 			params.isAvailable = filters.availability === "available";
 
 		if (filters.featured !== "all")
-			params.featured = filters.featured === "featured";
+			params.isFeatured = filters.featured === "featured";
 
 		return params;
 	}, [filters, pagination, sorting]);
@@ -199,30 +205,30 @@ function RouteComponent() {
 			},
 		},
 		{
-			accessorKey: "category",
+			accessorKey: "food_type",
 			header: ({ column }) => {
 				return (
 					<Button
 						variant="ghost"
 						onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
 					>
-						Type
+						Food Type
 						<ArrowUpDown className="ml-2 size-4" />
 					</Button>
 				);
 			},
 			cell: ({ row }) => (
 				<span>
-					{row.original.category === PIZZA_CATEGORY.VEG ? (
-						<Badge className="bg-green-600">{row.original.category}</Badge>
+					{row.original.foodType === FOOD_TYPE.VEG ? (
+						<Badge className="bg-green-600">{row.original.foodType}</Badge>
 					) : (
-						<Badge variant="destructive">{row.original.category}</Badge>
+						<Badge variant="destructive">{row.original.foodType}</Badge>
 					)}
 				</span>
 			),
 		},
 		{
-			accessorKey: "featured",
+			accessorKey: "is_featured",
 			header: ({ column }) => {
 				return (
 					<Button
@@ -235,7 +241,7 @@ function RouteComponent() {
 				);
 			},
 			cell: ({ row }) => {
-				const isFeatured = row.original.featured;
+				const isFeatured = row.original.isFeatured;
 				return (
 					<Switch
 						onCheckedChange={(val) => {
@@ -347,18 +353,16 @@ function RouteComponent() {
 				/>
 
 				<Select
-					value={filters.category}
-					onValueChange={(value) => handleFilterChange("category", value)}
+					value={filters.foodType}
+					onValueChange={(value) => handleFilterChange("foodType", value)}
 				>
 					<SelectTrigger className="w-[180px]">
 						<SelectValue placeholder="Category" />
 					</SelectTrigger>
 					<SelectContent>
-						<SelectItem value="all">All Categories</SelectItem>
-						<SelectItem value={PIZZA_CATEGORY.VEG}>Vegetarian</SelectItem>
-						<SelectItem value={PIZZA_CATEGORY.NONVEG}>
-							Non-Vegetarian
-						</SelectItem>
+						<SelectItem value="all">All Food Type</SelectItem>
+						<SelectItem value={FOOD_TYPE.VEG}>Vegetarian</SelectItem>
+						<SelectItem value={FOOD_TYPE.NONVEG}>Non-Vegetarian</SelectItem>
 					</SelectContent>
 				</Select>
 

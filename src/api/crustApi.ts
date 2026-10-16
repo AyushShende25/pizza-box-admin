@@ -17,7 +17,7 @@ export const crustsApi = {
 		const { price, ...rest } = crustFormData;
 		const res = await api.post("/menu/crusts", {
 			...rest,
-			additionalPrice: price,
+			priceModifier: price,
 		});
 		return res.data;
 	},
@@ -26,7 +26,7 @@ export const crustsApi = {
 
 		const res = await api.patch(`/menu/crusts/${crustId}`, {
 			...rest,
-			additionalPrice: price,
+			priceModifier: price,
 		});
 		return res.data;
 	},

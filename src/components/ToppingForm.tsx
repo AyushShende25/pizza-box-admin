@@ -13,7 +13,8 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { handleUpload } from "@/lib/utils";
-import { TOPPING_CATEGORY, TOPPING_TYPE, type Topping } from "@/types/toppings";
+import { FOOD_TYPE } from "@/types/pizza";
+import { TOPPING_CATEGORY, type Topping } from "@/types/toppings";
 
 const toppingFormSchema = z.object({
 	name: z.string().min(1, "Name is required").max(100),
@@ -22,7 +23,7 @@ const toppingFormSchema = z.object({
 		.min(1, "Price must be positive"),
 	description: z.string().optional(),
 	category: z.enum(TOPPING_CATEGORY, "choose the correct field"),
-	type: z.enum(TOPPING_TYPE, "choose the correct field"),
+	foodType: z.enum(FOOD_TYPE, "choose the correct field"),
 	toppingImage: z
 		.file()
 		.max(10 * 1024 * 1024, "max file size allowed is: 10mb")
@@ -41,11 +42,10 @@ type ToppingFormProps = {
 function ToppingForm({ mode, topping, toppingId }: ToppingFormProps) {
 	const defaultValues: ToppingFormType = {
 		name: topping?.name ?? "",
-		price: topping?.price ?? 0,
+		price: Number(topping?.priceModifier) ?? 0,
 		description: topping?.description,
 		category: topping?.category ?? TOPPING_CATEGORY.VEGETABLE,
-		type:
-			topping?.isVegetarian === true ? TOPPING_TYPE.VEG : TOPPING_TYPE.NON_VEG,
+		foodType: topping?.foodType ?? FOOD_TYPE.VEG,
 		toppingImage: undefined,
 	};
 
@@ -186,7 +186,7 @@ function ToppingForm({ mode, topping, toppingId }: ToppingFormProps) {
 					)}
 				/>
 				<form.Field
-					name="type"
+					name="foodType"
 					children={(field) => (
 						<div className="grid gap-3">
 							<Label>Topping type</Label>
@@ -200,7 +200,7 @@ function ToppingForm({ mode, topping, toppingId }: ToppingFormProps) {
 									<SelectValue placeholder="Select Type" />
 								</SelectTrigger>
 								<SelectContent>
-									{Object.values(TOPPING_TYPE).map((item) => (
+									{Object.values(FOOD_TYPE).map((item) => (
 										<SelectItem key={item} value={item}>
 											{item}
 										</SelectItem>

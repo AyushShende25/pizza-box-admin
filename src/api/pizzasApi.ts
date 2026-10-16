@@ -54,7 +54,7 @@ export const pizzasApi = {
 	},
 	toggleIsFeatured: async (pizzaId: string, isFeatured: boolean) => {
 		const res = await api.patch(`/menu/pizzas/${pizzaId}`, {
-			featured: isFeatured,
+			isFeatured,
 		});
 		return res.data;
 	},
@@ -199,7 +199,7 @@ export function useTogglePizzaFeatured() {
 				queryClient.setQueryData<PizzaListResponse>(queryKey, {
 					...previousData,
 					items: previousData.items.map((pizza) =>
-						pizza.id === pizzaId ? { ...pizza, featured: isFeatured } : pizza,
+						pizza.id === pizzaId ? { ...pizza, isFeatured } : pizza,
 					),
 				});
 			}

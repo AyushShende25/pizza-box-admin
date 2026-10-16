@@ -1,7 +1,7 @@
 export type Size = {
 	name: string;
 	displayName: string;
-	multiplier: number;
+	priceModifier: string;
 	isAvailable: boolean;
 	sortOrder: number;
 	id: string;

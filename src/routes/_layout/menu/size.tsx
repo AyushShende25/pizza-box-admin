@@ -34,7 +34,7 @@ function RouteComponent() {
 
 	const columns: ColumnDef<Size>[] = [
 		{
-			accessorKey: "sortOrder",
+			accessorKey: "sort_order",
 			header: "Order",
 			cell: ({ row }) => {
 				return (
@@ -63,13 +63,13 @@ function RouteComponent() {
 			),
 		},
 		{
-			accessorKey: "multiplier",
-			header: "Multiplier",
+			accessorKey: "price_modifier",
+			header: "Price",
 			cell: ({ row }) => {
-				const multiplier = Number(row.original.multiplier);
+				const multiplier = Number(row.original.priceModifier);
 				return (
 					<span className="font-medium whitespace-nowrap">
-						x{multiplier.toFixed(2)}
+						₹{multiplier.toFixed(2)}
 					</span>
 				);
 			},

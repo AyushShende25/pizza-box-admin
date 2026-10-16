@@ -1,3 +1,5 @@
+import type { SortOrder } from "./pizza";
+
 export const ORDER_STATUS = {
 	PENDING: "pending",
 	CONFIRMED: "confirmed",
@@ -27,6 +29,7 @@ export type FetchOrdersParams = {
 	page?: number;
 	limit?: number;
 	sortBy?: string;
+	order?: SortOrder;
 	orderStatus?: OrderStatus;
 	paymentStatus?: PaymentStatus;
 	paymentMethod?: PaymentMethod;
@@ -45,13 +48,20 @@ export type Order = {
 	orderNo: string;
 	orderItems: OrderItem[];
 	userId: string;
+	customerName: string;
 	orderStatus: OrderStatus;
 	paymentStatus: PaymentStatus;
 	subtotal: string;
 	tax: string;
 	deliveryCharge: string;
 	total: string;
-	deliveryAddress: string;
+	deliveryName: string;
+	deliveryPhone: string;
+	deliveryStreet: string;
+	deliveryCity: string;
+	deliveryState: string;
+	deliveryPostalCode: string;
+	deliveryCountry: string;
 	notes?: string;
 	paymentMethod: PaymentMethod;
 	createdAt: string;
@@ -64,8 +74,8 @@ export type OrderItem = {
 	pizzaName: string;
 	sizeName: string;
 	crustName: string;
-	sizePrice: string;
-	crustPrice: string;
+	sizePriceModifier: string;
+	crustPriceModifier: string;
 	basePizzaPrice: string;
 	toppingsTotalPrice: string;
 	unitPrice: string;

@@ -16,7 +16,7 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { handleUpload } from "@/lib/utils";
-import { PIZZA_CATEGORY, type Pizza } from "@/types/pizza";
+import { FOOD_TYPE, type Pizza } from "@/types/pizza";
 
 type PizzaFormProps = {
 	mode: "create" | "edit";
@@ -32,7 +32,7 @@ const pizzaFormSchema = z.object({
 	basePrice: z
 		.number("please enter a valid number")
 		.min(1, "Price must be positive"),
-	category: z.enum(PIZZA_CATEGORY, "choose the correct field"),
+	foodType: z.enum(FOOD_TYPE, "choose the correct field"),
 	pizzaImage: z
 		.file()
 		.max(10 * 1024 * 1024, "max file size allowed is: 10mb")
@@ -49,7 +49,7 @@ function PizzaForm({ mode, pizza, pizzaId }: PizzaFormProps) {
 		name: pizza?.name ?? "",
 		description: pizza?.description ?? "",
 		basePrice: Number(pizza?.basePrice) ?? 0,
-		category: pizza?.category ?? PIZZA_CATEGORY.VEG,
+		foodType: pizza?.foodType ?? FOOD_TYPE.VEG,
 		pizzaImage: undefined,
 		defaultToppings: pizza?.defaultToppings ?? [],
 	};
@@ -168,7 +168,7 @@ function PizzaForm({ mode, pizza, pizzaId }: PizzaFormProps) {
 					)}
 				/>
 				<form.Field
-					name="category"
+					name="foodType"
 					children={(field) => (
 						<div className="grid gap-3">
 							<Label>Pizza type</Label>
@@ -182,7 +182,7 @@ function PizzaForm({ mode, pizza, pizzaId }: PizzaFormProps) {
 									<SelectValue placeholder="Select Type" />
 								</SelectTrigger>
 								<SelectContent>
-									{Object.values(PIZZA_CATEGORY).map((item) => (
+									{Object.values(FOOD_TYPE).map((item) => (
 										<SelectItem key={item} value={item}>
 											{item}
 										</SelectItem>
