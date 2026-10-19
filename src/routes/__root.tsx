@@ -29,7 +29,7 @@ function RootComponent() {
 				<Outlet />
 			</div>
 			<Toaster />
-			<ReactQueryDevtools buttonPosition="top-right" />
+			<ReactQueryDevtools buttonPosition="bottom-left" />
 			<TanStackRouterDevtools position="bottom-right" />
 		</>
 	);

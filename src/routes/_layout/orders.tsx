@@ -53,7 +53,7 @@ export const Route = createFileRoute("/_layout/orders")({
 	component: RouteComponent,
 	loader: async ({ context }) => {
 		await context.queryClient.ensureQueryData(
-			fetchOrdersQueryOptions({ page: 1, limit: 5 }),
+			fetchOrdersQueryOptions({ page: 1, limit: 10 }),
 		);
 	},
 });
@@ -61,7 +61,7 @@ export const Route = createFileRoute("/_layout/orders")({
 function RouteComponent() {
 	const [pagination, setPagination] = useState<PaginationState>({
 		pageIndex: 0,
-		pageSize: 5,
+		pageSize: 10,
 	});
 
 	const [sorting, setSorting] = useState<SortingState>([

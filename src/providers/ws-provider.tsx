@@ -94,18 +94,14 @@ function WsProvider({ children }: { children: React.ReactNode }) {
 	const handleMessage = (message: WSNotification) => {
 		console.log("Received message:", message);
 		switch (message.type) {
-			case "ORDER_CREATED":
-			case "ORDER_STATUS_CHANGED":
-			case "ORDER_DELAYED":
-			case "ORDER_CANCELLED":
+			case "order_update":
 				toast.success(message.message);
 				queryClient.invalidateQueries({ queryKey: ["orders"] });
 				queryClient.invalidateQueries({ queryKey: ["stats"] });
 				queryClient.invalidateQueries({ queryKey: ["monthly-sales"] });
 				break;
-			case "PAYMENT_SUCCESSFUL":
-			case "PAYMENT_FAILED":
-				toast.success(message.message);
+			case "payment_update":
+				// toast.success(message.message);
 				queryClient.invalidateQueries({ queryKey: ["orders"] });
 				break;
 
