@@ -39,6 +39,7 @@ import {
 	FOOD_TYPE,
 	type FoodType,
 	type Pizza,
+	type SortField,
 } from "@/types/pizza";
 
 export const Route = createFileRoute("/_layout/menu/pizza")({
@@ -105,7 +106,7 @@ function RouteComponent() {
 		const params: FetchPizzaParams = {
 			page: pagination.pageIndex + 1,
 			limit: pagination.pageSize,
-			sortBy: sorting[0].id,
+			sortBy: sorting[0].id as SortField,
 			order: sorting[0].desc ? "desc" : "asc",
 		};
 
